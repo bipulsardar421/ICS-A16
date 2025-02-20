@@ -1,0 +1,14 @@
+#welcome {
+    background: linear-gradient(
+        rgba(var(--c-brand-rgb), 0.507),
+        rgba(var(--c-brand-rgb), 0.438)
+      ),
+      url("/inventory.jpg");
+    background-position: center;
+    background-size: cover;
+  }
+  
+  .btn-brand {
+    background-color: var(--c-brand);
+  }
+  

@@ -1,0 +1,71 @@
+<div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-1/4 bg-gray-200 p-4 overflow-y-auto">
+        <h2 class="text-lg font-semibold mb-4">INVOICES</h2>
+        <ul class="space-y-2">
+            <li *ngFor="let invoice of invoices" class="bg-white p-2 rounded-md cursor-pointer hover:bg-gray-300"
+                (click)="selectInvoice(invoice)">
+                {{ invoice.name }}
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Invoice Viewer -->
+    <main class="flex-1 bg-gray-300 p-4 flex justify-center items-center">
+        <div class="bg-white p-8 shadow-md w-full max-w-2xl border border-black">
+            <h1 class="text-2xl font-bold mb-4">INVOICE</h1>
+            <div class="mb-4">
+                <p>{{ selectedInvoice.companyName }}</p>
+                <p>{{ selectedInvoice.address }}</p>
+                <p>{{ selectedInvoice.city }}</p>
+                <p>Phone: {{ selectedInvoice.phone }}</p>
+            </div>
+
+            <div class="flex justify-between mb-4">
+                <div>
+                    <p class="font-semibold">BILL TO</p>
+                    <p>{{ selectedInvoice.billTo.name }}</p>
+                    <p>{{ selectedInvoice.billTo.company }}</p>
+                    <p>{{ selectedInvoice.billTo.address }}</p>
+                    <p>{{ selectedInvoice.billTo.city }}</p>
+                    <p>{{ selectedInvoice.billTo.phone }}</p>
+                    <p>{{ selectedInvoice.billTo.email }}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">INVOICE #</p>
+                    <p>{{ selectedInvoice.invoiceNumber }}</p>
+                    <p class="font-semibold">DATE</p>
+                    <p>{{ selectedInvoice.date }}</p>
+                </div>
+            </div>
+
+            <table class="w-full mb-4">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2 text-left">DESCRIPTION</th>
+                        <th class="p-2 text-right">AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of selectedInvoice.items">
+                        <td class="p-2 border-t">{{ item.description }}</td>
+                        <td class="p-2 border-t text-right">{{ item.amount | currency }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="flex justify-between items-center">
+                <p>Thank you for your business!</p>
+                <div class="text-right">
+                    <p class="font-semibold">TOTAL</p>
+                    <p class="text-xl font-bold">{{ selectedInvoice.total | currency }}</p>
+                </div>
+            </div>
+
+            <p class="mt-4 text-sm text-gray-500">
+                If you have any questions about this invoice, please contact {{ selectedInvoice.contactInfo }}
+            </p>
+        </div>
+    </main>
+</div>
+

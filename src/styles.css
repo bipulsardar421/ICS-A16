@@ -1,1 +1,59 @@
-/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+  padding: 0;
+
+}
+
+body {
+  margin: 0;
+  font-family: CALIBRI, "Helvetica Neue", sans-serif;
+}
+
+
+:root {
+  --c-dark: #212529;
+  --c-brand: #2fc0fa;
+  --c-brand-light: #69c2dd;
+  --c-brand-rgb: 78, 87, 212;
+  --c-body: #727272;
+  --box-shadown: 0px 15px 25px rgba(0, 0, 0, 0.08);
+  --transition: all 0.5s ease;
+}
+
+section {
+  padding: 100px 0;
+}
+
+
+.bg-brand {
+  background-color: #1a202c;
+}
+
+.text-brand {
+  color: #1a202c;
+}
+
+.navbar {
+  box-shadow: var(--box-shadow);
+}
+
+.navbar-nav .nav-link {
+  font-weight: 500;
+  color: var(--c-dark);
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--c-brand);
+}
+
+a {
+  text-decoration: none;
+  color: var(--c-brand);
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--c-brand-light);
+}

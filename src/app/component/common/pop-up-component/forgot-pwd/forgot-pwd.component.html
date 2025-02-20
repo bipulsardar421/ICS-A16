@@ -1,0 +1,48 @@
+<ng-template #forgotPwd let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Pasword Reset</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form *ngIf="!otpSuccess" [formGroup]="forgotPasswordForm" (ngSubmit)="onGenerateOtp()">
+            <div class="mb-3">
+                <label for="forgotUsername" class="form-label">Email</label>
+                <input type="text" id="forgotUsername" class="form-control" formControlName="username" />
+                <div *ngIf="forgotPasswordForm.controls['username'].touched" class="text-danger">
+                    <div *ngIf="forgotPasswordForm.controls['username'].errors?.['required']">
+                      Email is required
+                    </div>
+                    <div *ngIf="forgotPasswordForm.controls['username'].errors?.['email']">
+                      Enter a valid email address
+                    </div>
+                  </div>                  
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary me-2" type="submit" [disabled]="forgotPasswordForm.invalid">Generate
+                    OTP</button>
+                <button class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+            </div>
+        </form>
+
+        <form *ngIf="otpSuccess" [formGroup]="otpSubmitForm" (ngSubmit)="submitOtp()">
+            <div class="mb-3">
+                <label for="otp" class="form-label">Enter OTP</label>
+                <input type="text" id="otp" class="form-control" formControlName="otp" />
+                <div *ngIf="otpSubmitForm.controls['otp'].touched" class="text-danger">
+                    <div *ngIf="otpSubmitForm.controls['otp'].errors?.['required']">
+                        OTP is required
+                    </div>
+                    <div *ngIf="otpSubmitForm.controls['otp'].errors?.['pattern']">
+                        OTP must be a 6-digit number
+                    </div>
+                </div>
+
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary me-2" type="submit" [disabled]="otpSubmitForm.invalid">Submit
+                    OTP</button>
+                <button class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
