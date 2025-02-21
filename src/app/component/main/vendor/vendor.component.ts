@@ -1,14 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ModalService, ModalType } from '../../data/services/modal.service';
+import { AddEditVendorComponent } from "../../common/pop-up-component/add-edit-vendor/add-edit-vendor.component";
 
 @Component({
   selector: 'app-vendor',
-  standalone: true, // If using standalone components
-  imports: [CommonModule],
+  standalone: true, 
+  imports: [CommonModule, AddEditVendorComponent],
   templateUrl: './vendor.component.html',
-  styleUrls: ['./vendor.component.css'] // FIXED: should be an array
+  styleUrls: ['./vendor.component.css']
 })
 export class VendorComponent {
+  private modalService = inject(ModalService);
+
   vendors = [
     { name: "Vendor 1", phone: "1234567890", image: "https://placehold.co/100x100" },
     { name: "Vendor 2", phone: "0987654321", image: "https://placehold.co/100x100" },
@@ -23,11 +27,11 @@ export class VendorComponent {
   ];
 
   addVendor() {
-    this.vendors.push({
-      name: 'New Vendor',
-      phone: '0000000000',
-      image: 'https://placehold.co/100x100'
-    });
+    this.modalService.dataTransferer("hii sending data")
+    this.openModel();
+  }
+  openModel() {
+    this.modalService.triggerOpenModal(ModalType.VENDOR);
   }
 
   deleteVendor(index: number) {

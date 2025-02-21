@@ -5,10 +5,11 @@ import { VendorComponent } from "./vendor/vendor.component";
 import { ProductComponent } from "./product/product.component";
 import { ReportComponent } from "./report/report.component";
 import { InvoiceComponent } from "./invoice/invoice.component";
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-main',
-  imports: [MainNavigationComponent, VendorComponent, ProductComponent, ReportComponent, InvoiceComponent],
+  imports: [MainNavigationComponent, RouterOutlet],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
 })
