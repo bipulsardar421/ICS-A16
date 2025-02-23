@@ -6,7 +6,8 @@ export enum ModalType {
   FORGOTPWD = 'FORGOTPWD',
   RESETPWD = 'RESETPWD',
   PRODUCT = 'PRODUCT',
-  VENDOR = 'VENDOR'
+  VENDOR = 'VENDOR',
+  OTP = 'OTP',
 }
 
 @Injectable({
@@ -14,18 +15,21 @@ export enum ModalType {
 })
 export class ModalService {
   private modalService = inject(NgbModal);
-  public openModalEvent: EventEmitter<ModalType> = new EventEmitter<ModalType>();
+  public openModalEvent: EventEmitter<ModalType> =
+    new EventEmitter<ModalType>();
   public dataTransferObject: EventEmitter<any> = new EventEmitter<any>();
 
   open(content: TemplateRef<any>) {
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
-      (result) => {
-        console.log(`Closed with: ${result}`);
-      },
-      (reason) => {
-        console.log(`Dismissed ${this.getDismissReason(reason)}`);
-      },
-    );
+    this.modalService
+      .open(content, { ariaLabelledBy: 'modal-basic-title' })
+      .result.then(
+        (result) => {
+          console.log(`Closed with: ${result}`);
+        },
+        (reason) => {
+          console.log(`Dismissed ${this.getDismissReason(reason)}`);
+        }
+      );
   }
 
   private getDismissReason(reason: any): string {
@@ -43,7 +47,7 @@ export class ModalService {
     this.openModalEvent.emit(modalType);
   }
 
-  public dataTransferer(dto:any) {
+  public dataTransferer(dto: any) {
     this.dataTransferObject.emit(dto);
   }
 }

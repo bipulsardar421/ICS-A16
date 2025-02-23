@@ -1,0 +1,14 @@
+<div class="alert-container">
+  <ngb-alert
+    *ngIf="alertService.isVisible"
+    [dismissible]="true"
+    (close)="close()"
+    [type]="alertService.alertType"
+  >
+    {{ alertService.message }}
+  </ngb-alert>
+</div>
+
+<div class="loading-overlay" *ngIf="alertService.isLoading">
+  <mat-spinner></mat-spinner>
+</div>

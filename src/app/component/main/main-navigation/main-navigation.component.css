@@ -17,3 +17,9 @@
     transform: translateY(-50%);
     color: #888;
 }
+
+/* Custom class to move the dropdown slightly to the left */
+.custom-dropdown {
+    margin-left: -20px; /* Adjust this value to move it more to the left */
+  }
+  

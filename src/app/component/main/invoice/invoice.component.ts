@@ -1,68 +1,75 @@
-import { CurrencyPipe, NgFor } from '@angular/common';
+import { CommonModule, CurrencyPipe, NgFor } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-invoice',
-  imports: [CurrencyPipe, NgFor],
+  imports: [NgFor, CommonModule],
   templateUrl: './invoice.component.html',
-  styleUrl: './invoice.component.css'
+  styleUrl: './invoice.component.css',
 })
 export class InvoiceComponent {
   invoices = [
-    {
-      name: "Invoice_2024_08_21_kdf",
-      companyName: "[Company Name]",
-      address: "[Street Address]",
-      city: "[City, ST ZIP Code]",
-      phone: "(555) 555-5555",
-      billTo: {
-        name: "[Name]",
-        company: "[Company Name]",
-        address: "[Street Address]",
-        city: "[City, ST ZIP Code]",
-        phone: "[Phone number]",
-        email: "[Email address]",
-      },
-      invoiceNumber: 123456,
-      date: "2024-08-21",
-      items: [
-        { description: "Service Fee", amount: 200.0 },
-        { description: "Labor: 5 hours at $75/hr", amount: 375.0 },
-        { description: "Tax: 8.25% of $575", amount: 47.44 },
-        { description: "Total 2.5% discount", amount: -22.0 },
-      ],
-      total: 600.44,
-      contactInfo: "[Name, Phone, and Email]",
-    },
-    {
-      name: "Invoice_2023_06_21_kdf",
-      companyName: "ABC Corp",
-      address: "123 Market St",
-      city: "San Francisco, CA 94105",
-      phone: "(555) 123-4567",
-      billTo: {
-        name: "John Doe",
-        company: "XYZ Ltd.",
-        address: "789 Elm St",
-        city: "Los Angeles, CA 90001",
-        phone: "(555) 987-6543",
-        email: "john.doe@example.com",
-      },
-      invoiceNumber: 654321,
-      date: "2023-06-21",
-      items: [
-        { description: "Consulting", amount: 500.0 },
-        { description: "Software License", amount: 150.0 },
-        { description: "Tax: 10%", amount: 65.0 },
-      ],
-      total: 715.0,
-      contactInfo: "support@abc.com",
-    }
+    'Invoice_2024_08_21.kdf',
+    'Invoice_2021_07_01.kdf',
+    'Invoice_2023_06_21.kdf',
+    'Invoice_2022_08_29.kdf',
+    'Invoice_2022_08_27.kdf',
+    'Invoice_2022_05_21.kdf',
+    'Invoice_2024_08_21.kdf',
+    'Invoice_2021_07_01.kdf',
+    'Invoice_2023_06_21.kdf',
+    'Invoice_2022_08_29.kdf',
+    'Invoice_2022_08_27.kdf',
+    'Invoice_2022_05_21.kdf',
+    'Invoice_2024_08_21.kdf',
+    'Invoice_2021_07_01.kdf',
+    'Invoice_2023_06_21.kdf',
+    'Invoice_2022_08_29.kdf',
+    'Invoice_2022_08_27.kdf',
+    'Invoice_2022_05_21.kdf',
+    'Invoice_2024_08_21.kdf',
+    'Invoice_2021_07_01.kdf',
+    'Invoice_2023_06_21.kdf',
+    'Invoice_2022_08_29.kdf',
+    'Invoice_2022_08_27.kdf',
+    'Invoice_2022_05_21.kdf',
+    'Invoice_2024_08_21.kdf',
   ];
 
-  selectedInvoice = this.invoices[0];
+  company = {
+    name: 'Company Name',
+    address: 'Street Address',
+    city: 'City, ST ZIP',
+    phone: '(000) 000-0000',
+  };
 
-  selectInvoice(invoice: any) {
-    this.selectedInvoice = invoice;
+  client = {
+    name: 'Client Name',
+    company: 'Client Company',
+    address: 'Client Street Address',
+    city: 'Client City, ST ZIP',
+    phone: 'Client Phone',
+    email: 'Client Email',
+  };
+
+  invoiceDetails = {
+    id: 123456,
+    date: new Date().toISOString().split('T')[0],
+    items: [
+      { description: 'Service Fee', amount: 200.0 },
+      { description: 'Service Fee x 3.517%', amount: 7.03 },
+      { description: 'New discount', amount: -10.0 },
+      { description: 'Tax 21.5% after discount', amount: 45.16 },
+    ],
+  };
+
+  getTotal() {
+    return this.invoiceDetails.items
+      .reduce((sum, item) => sum + item.amount, 0)
+      .toFixed(2);
+  }
+
+  printInvoice() {
+    window.print();
   }
 }

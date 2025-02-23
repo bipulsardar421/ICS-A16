@@ -57,3 +57,31 @@ a {
 a:hover {
   color: var(--c-brand-light);
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+::-webkit-scrollbar {
+  width: 8px; 
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #cccccc, #98949d); 
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #cccccc, #98949d); 
+}
+
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cccccc #f1f1f1; 
+}

@@ -1,5 +1,7 @@
 export interface UsersInterface {
-    userId: number;
-    uName: string;
-    role: string;
+  image: string;
+  user_name: string;
+  phone: number;
+  address: string;
+  user_id: number;
 }

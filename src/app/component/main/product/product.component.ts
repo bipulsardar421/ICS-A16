@@ -1,19 +1,33 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
+import { StockService } from '../../data/services/stock/stock.service';
+import { StockInterface } from '../../data/interfaces/stock.interface';
 
 @Component({
   selector: 'app-product',
   imports: [CommonModule, FormsModule],
   templateUrl: './product.component.html',
-  styleUrl: './product.component.css'
+  styleUrl: './product.component.css',
 })
-export class ProductComponent {
-  products = [
-    { name: "FUJIFILM | DSLR", image: "https://placehold.co/200x200", quantity: 130 },
-    { name: "GPU | RTX 2080", image: "https://placehold.co/200x200", quantity: 100 },
-    { name: "IPHONE 8 | PRO", image: "https://placehold.co/200x200", quantity: 50 },
-    { name: "COSMETIC | MAKEUP KIT", image: "https://placehold.co/200x200", quantity: 75 },
-    { name: "FUJIFILM | DSLR", image: "https://placehold.co/200x200", quantity: 200 }
-  ];
+export class ProductComponent implements OnInit {
+  products: StockInterface[] = [];
+  qty: number = 0;
+  constructor(private _stockService: StockService) {}
+  ngOnInit(): void {
+    this.getStockDetails();
+  }
+  getStockDetails() {
+    this._stockService.getStock().subscribe({
+      next: (response) => {
+        this.products = response;
+        if (response.status !== 'error') {
+        } else {
+        }
+      },
+      error: (error) => {
+        console.error('Signup failed', error);
+      },
+    });
+  }
 }
