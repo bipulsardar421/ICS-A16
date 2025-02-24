@@ -14,7 +14,8 @@ export const routes: Routes = [
   {
     path: 'main',
     component: MainComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['client', 'admin', 'vendor'] },
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'invoice', component: InvoiceComponent },

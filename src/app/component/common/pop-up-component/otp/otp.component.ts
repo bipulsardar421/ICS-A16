@@ -84,15 +84,13 @@ export class OtpComponent {
       this.alertService.showLoading();
       this._loginService.matchOtp(formData).subscribe({
         next: (response) => {
-          this.alertService.hideLoading();
-          console.log('response from api', response);
-          this.router.navigate(['/main/home']);
           if (response.status !== 'error') {
             this.alertService.showAlert('success', 'Please Continue to Login.');
-            // setTimeout(() => {
-            //   this.ngbModalService.dismissAll();
-            //   this.modalService.triggerOpenModal(ModalType.LOGIN);
-            // }, 1000);
+            setTimeout(() => {
+              this.alertService.hideLoading();
+              this.ngbModalService.dismissAll();
+              this.router.navigate(['/main/home']);
+            }, 1000);
           } else {
             this.alertService.showAlert('danger', response.message);
           }

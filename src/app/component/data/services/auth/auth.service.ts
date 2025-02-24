@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, catchError, first } from 'rxjs/operators';
 import { ApiService } from '../api/api.service';
@@ -14,14 +14,15 @@ export class AuthService {
   private baseUrl: string = this.apiService.getBaseUrl();
   private sessionCheckUrl = `${this.baseUrl}/auth/session/check`;
   private logoutUrl = `${this.baseUrl}/auth/session/logout`;
+  private getUserId = `${this.baseUrl}/auth/session/getId`;
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   private userRoleSubject = new BehaviorSubject<string | null>(null);
-  private sessionCheckedSubject = new BehaviorSubject<boolean>(false); // NEW
+  private sessionCheckedSubject = new BehaviorSubject<boolean>(false);
 
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   userRole$ = this.userRoleSubject.asObservable();
-  sessionChecked$ = this.sessionCheckedSubject.asObservable(); // NEW
+  sessionChecked$ = this.sessionCheckedSubject.asObservable();
 
   constructor() {
     this.checkSession();
@@ -40,7 +41,7 @@ export class AuthService {
           const isAuthenticated = response.status === 'true';
           this.isAuthenticatedSubject.next(isAuthenticated);
           this.userRoleSubject.next(isAuthenticated ? response.role ?? null : null);
-          this.sessionCheckedSubject.next(true); // NEW: Mark session check as complete
+          this.sessionCheckedSubject.next(true);
 
           console.log('Session check response:', response);
           console.log('AuthService - isAuthenticated:', this.isAuthenticatedSubject.value);
@@ -50,7 +51,7 @@ export class AuthService {
           console.error('Session check failed', error);
           this.isAuthenticatedSubject.next(false);
           this.userRoleSubject.next(null);
-          this.sessionCheckedSubject.next(true); // NEW: Mark session check as complete even on failure
+          this.sessionCheckedSubject.next(true);
           return of(null);
         })
       )
@@ -84,5 +85,14 @@ export class AuthService {
         })
       )
       .subscribe();
+  }
+
+  getUID():
+    Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.getUserId, {}, {
+      headers,
+      withCredentials: true,
+    });
   }
 }

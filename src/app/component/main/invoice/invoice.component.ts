@@ -1,5 +1,7 @@
 import { CommonModule, CurrencyPipe, NgFor } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { InvoiceService } from '../../data/services/invoice/invoice.service';
+import { AuthService } from '../../data/services/auth/auth.service';
 
 @Component({
   selector: 'app-invoice',
@@ -7,7 +9,44 @@ import { Component } from '@angular/core';
   templateUrl: './invoice.component.html',
   styleUrl: './invoice.component.css',
 })
-export class InvoiceComponent {
+export class InvoiceComponent implements OnInit {
+  constructor(private invoiceService: InvoiceService, private auth: AuthService) {
+
+  }
+  ngOnInit(): void {
+    this.getUserId()
+
+  }
+
+
+  getUserId() {
+    this.auth.getUID().subscribe({
+      next: (response) => {
+        const uid = new FormData();
+        uid.append("uid", response.user_id)
+        this.getInvoices(uid)
+        if (response.status !== 'error') {
+        } else {
+        }
+      },
+      error: (error) => {
+        console.error('Signup failed', error);
+      },
+    });
+  }
+
+  getInvoices(uid: FormData) {
+    this.invoiceService.getInvoiceDetails(uid).subscribe({
+      next: (response) => {
+        if (response.status !== 'error') {
+        } else {
+        }
+      },
+      error: (error) => {
+        console.error('Signup failed', error);
+      },
+    });
+  }
   invoices = [
     'Invoice_2024_08_21.kdf',
     'Invoice_2021_07_01.kdf',

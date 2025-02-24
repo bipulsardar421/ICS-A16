@@ -5,46 +5,27 @@
   </div>
   <hr />
   <div class="row g-3">
-    <div
-      class="col-12 col-sm-6 col-md-4 col-lg-3"
-      *ngFor="let product of products"
-    >
-      <div
-        class="card shadow-sm border-0"
-        style="max-width: 250px; margin: auto"
-      >
-        <img
-          [src]="product.image"
-          class="card-img-top img-fluid"
-          alt="Product Image"
-          style="height: 150px; object-fit: cover"
-        />
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products">
+      <div class="card shadow-sm border-0" style="max-width: 250px; margin: auto">
+        <img ngSrc="{{ product.image }}" class="card-img-top img-fluid" alt="Product Image" width="200" height="150"
+          intrinsic style="object-fit: cover" />
+
+
+
         <div class="card-body text-center">
-          <h6
-            class="card-title product-name text-truncate"
-            [title]="product.product_name"
-            style="max-width: 200px"
-          >
+          <h6 class="card-title product-name text-truncate" [title]="product.product_name" style="max-width: 200px">
             {{ product.product_name }}
           </h6>
           <div class="d-flex flex-column my-2">
             <div class="d-flex align-items-center justify-content-between">
               <label class="text-muted me-2">Stock:</label>
-              <span
-                class="form-control text-center bg-light px-2"
-                style="max-width: 70px"
-              >
+              <span class="form-control text-center bg-light px-2" style="max-width: 70px">
                 {{ product.quantity }}
               </span>
             </div>
             <div class="d-flex align-items-center justify-content-between mt-2">
               <label class="text-muted me-2">Qty:</label>
-              <input
-                type="number"
-                [(ngModel)]="qty"
-                class="form-control text-center px-2"
-                style="max-width: 70px"
-              />
+              <input type="number" [(ngModel)]="qty" class="form-control text-center px-2" style="max-width: 70px" />
             </div>
           </div>
           <div class="d-flex justify-content-between mt-3">
