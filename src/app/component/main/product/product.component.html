@@ -7,11 +7,8 @@
   <div class="row g-3">
     <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products">
       <div class="card shadow-sm border-0" style="max-width: 250px; margin: auto">
-        <img ngSrc="{{ product.image }}" class="card-img-top img-fluid" alt="Product Image" width="200" height="150"
-          intrinsic style="object-fit: cover" />
-
-
-
+        <img [ngSrc]="product.image" ngOptimizedImage class="card-img-top img-fluid" alt="Product Image" width="250"
+          height="150" style="height: 150px; object-fit: cover" />
         <div class="card-body text-center">
           <h6 class="card-title product-name text-truncate" [title]="product.product_name" style="max-width: 200px">
             {{ product.product_name }}
