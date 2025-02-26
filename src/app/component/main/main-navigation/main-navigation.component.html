@@ -57,30 +57,34 @@
       </div>
     </div>
     <div ngbDropdown class="d-flex align-items-center">
-  <img
-    src="https://placehold.co/40x40"
-    alt="User Avatar"
-    class="rounded-circle me-2"
-    width="40"
-    height="40"
-    ngbDropdownToggle
-  />
-  <div>
-    <p class="text-dark fw-bold mb-0">Bipul Sardar</p>
-    <p class="text-muted mb-0">Admin</p>
-  </div>
+      <a ngbDropdownToggle class="d-flex align-items-center form-control">
+        <img
+          src="{{ profile_image }}"
+          alt="User Avatar"
+          class="rounded-circle me-2"
+          width="40"
+          height="40"
+        />
+        <div>
+          <p class="text-dark fw-bold mb-0">{{ name }}</p>
+          <p class="text-muted mb-0">{{ role }}</p>
+        </div></a
+      >
 
-  <!-- Dropdown menu with placement and custom class -->
-  <div ngbDropdownMenu class="dropdown-menu custom-dropdown" placement="bottom-start">
-    <button class="dropdown-item" (click)="onProfileClick()">
-      Profile
-    </button>
-    <button class="dropdown-item" (click)="onSettingsClick()">
-      Settings
-    </button>
-    <button class="dropdown-item" (click)="onLogoutClick()">Logout</button>
-  </div>
-</div>
-
+      <!-- Dropdown menu with placement and custom class -->
+      <div
+        ngbDropdownMenu
+        class="dropdown-menu custom-dropdown"
+        placement="bottom-start"
+      >
+        <button class="dropdown-item" (click)="onProfileClick()">
+          Profile
+        </button>
+        <button class="dropdown-item" (click)="onSettingsClick()">
+          Settings
+        </button>
+        <button class="dropdown-item" (click)="onLogoutClick()">Logout</button>
+      </div>
+    </div>
   </div>
 </nav>

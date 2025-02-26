@@ -2,58 +2,38 @@
   <h1 class="text-3xl font-bold mb-6 text-center">Your Bag Contains</h1>
 
   <div class="card shadow-lg rounded-lg p-4">
-    <div
-      *ngFor="let product of products; let i = index"
-      class="d-flex align-items-center border-bottom py-3 mb-4"
-    >
+    <div *ngFor="let product of products; let i = index" class="d-flex align-items-center border-bottom py-3 mb-4">
       <div class="d-flex align-items-center w-100">
-        <img
-          [alt]="'Image of ' + product.name"
-          class="product-image"
-          [src]="product.image"
-        />
+        <img [alt]="'Image of ' + product.productName" class="product-image" [src]="product.productImage" />
         <div class="ml-4 w-100" style="margin-left: 10px;">
-          <h2 class="text-xl font-semibold text-dark">{{ product.name }}</h2>
-          <p class="text-muted text-sm">{{ product.description }}</p>
+          <h2 class="text-xl font-semibold text-dark">{{ product.productName }}</h2>
         </div>
         <div class="d-flex flex-column align-items-end ml-auto w-50">
-          <span class="text-dark mb-2"
-            >${{ product.price | number : "1.2-2" }}</span
-          >
+          <span class="text-dark mb-2">${{ product.price | number: '1.2-2' }}</span>
           <div class="d-flex align-items-center justify-content-end mb-2" style="margin-right: -14px;">
             <input
               class="form-control w-25"
               type="number"
               [(ngModel)]="product.quantity"
               min="1"
+              (change)="_cartService.updateCartQuantity(i, product.quantity)"
             />
-            <button
-              class="btn btn-link text-danger ml-3"
-              (click)="removeProduct(i)"
-            >
+            <button class="btn btn-link text-danger ml-3" (click)="removeProduct(i)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="d-flex justify-content-between align-items-center mt-6 pt-4 border-top"
-    >
+    <div class="d-flex justify-content-between align-items-center mt-6 pt-4 border-top">
       <div>
-        <span class="text-xl text-dark"
-          >Subtotal ({{ products.length }} items):</span
-        >
-        <h2 class="text-2xl font-semibold text-dark">
-          ${{ totalPrice() | number : "1.2-2" }}
-        </h2>
+        <span class="text-xl text-dark">Subtotal ({{ products.length }} items):</span>
+        <h2 class="text-2xl font-semibold text-dark">${{ totalPrice() | number: '1.2-2' }}</h2>
       </div>
-
       <div>
-        <button class="btn btn-warning btn-lg text-black" (click)="checkout()">
-          Generate Invoice
-        </button>
+        <button class="btn btn-warning btn-lg text-black" (click)="checkout()">Generate Invoice</button>
       </div>
     </div>
   </div>
 </div>
+<app-invoice></app-invoice>

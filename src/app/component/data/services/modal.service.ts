@@ -8,6 +8,8 @@ export enum ModalType {
   PRODUCT = 'PRODUCT',
   VENDOR = 'VENDOR',
   OTP = 'OTP',
+  USER='USER',
+  INVOICE='INVOICE'
 }
 
 @Injectable({

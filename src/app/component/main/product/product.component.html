@@ -1,16 +1,42 @@
 <section class="container my-0 shadow-sm">
   <div class="d-flex justify-content-between align-items-center mb-2">
     <h2 class="fw-semibold">PRODUCTS</h2>
+    
+    <button
+      class="btn btn-dark position-relative rounded-circle px-2.2 py-2"
+      [routerLink]="'/main/genInvoice'"
+    >
+      🛒
+      <span 
+        *ngIf="cartItemCount > 0" 
+        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+      >
+        {{ cartItemCount }}
+      </span>
+    </button>
+
     <button class="btn btn-dark rounded-circle px-3 py-2">+</button>
   </div>
+  
   <hr />
+
   <div class="row g-3">
     <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let product of products">
       <div class="card shadow-sm border-0" style="max-width: 250px; margin: auto">
-        <img [ngSrc]="product.image" ngOptimizedImage class="card-img-top img-fluid" alt="Product Image" width="250"
-          height="150" style="height: 150px; object-fit: cover" />
+        <img
+          [src]="product.image"
+          class="card-img-top img-fluid"
+          alt="Product Image"
+          width="250"
+          height="150"
+          style="height: 150px; object-fit: cover"
+        />
         <div class="card-body text-center">
-          <h6 class="card-title product-name text-truncate" [title]="product.product_name" style="max-width: 200px">
+          <h6
+            class="card-title product-name text-truncate"
+            [title]="product.product_name"
+            style="max-width: 200px"
+          >
             {{ product.product_name }}
           </h6>
           <div class="d-flex flex-column my-2">
@@ -22,12 +48,23 @@
             </div>
             <div class="d-flex align-items-center justify-content-between mt-2">
               <label class="text-muted me-2">Qty:</label>
-              <input type="number" [(ngModel)]="qty" class="form-control text-center px-2" style="max-width: 70px" />
+              <input
+                type="number"
+                [(ngModel)]="qtyMap[product.product_id]"
+                class="form-control text-center px-2"
+                style="max-width: 70px"
+                [max]="product.quantity"
+                (change)="qtyMap[product.product_id] = Math.min(qtyMap[product.product_id] || 0, product.quantity)"
+              />
             </div>
           </div>
           <div class="d-flex justify-content-between mt-3">
-            <button class="btn btn-danger px-3 py-1">Edit</button>
-            <button class="btn btn-success px-3 py-1">Add To Bag</button>
+            <button
+              class="btn btn-success px-3 py-1"
+              (click)="addToCart(product)"
+            >
+              Add To Bag
+            </button>
           </div>
         </div>
       </div>

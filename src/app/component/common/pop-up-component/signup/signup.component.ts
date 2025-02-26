@@ -23,6 +23,7 @@ export class SignupComponent {
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
   private fb = inject(FormBuilder);
+  
   signUpForm: FormGroup;
 
   @ViewChild('signupModal') signupModalContent!: TemplateRef<any>;
@@ -52,7 +53,7 @@ export class SignupComponent {
     this._signupService.registerUser(formData).subscribe({
       next: (response) => {
         this.alertService.hideLoading();
-        console.log('response from api', response);
+
         if (response.status !== 'error') {
           this.alertService.showAlert('success', response.message);
           this.getOtp();

@@ -6,7 +6,9 @@ export class FormDataConverter {
     
     Object.keys(formGroup.controls).forEach(key => {
       const value = formGroup.get(key)?.value;
-      if (value !== null && value !== undefined) {
+      if (value instanceof File) {
+        formData.append(key, value, value.name);
+      } else if (value !== null && value !== undefined) {
         formData.append(key, value);
       }
     });

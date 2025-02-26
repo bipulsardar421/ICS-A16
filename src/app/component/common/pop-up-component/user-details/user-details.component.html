@@ -1,0 +1,112 @@
+<ng-template #user_details let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Complete Your Profile Details</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="form-group mb-3">
+        <label for="user_id">User ID</label>
+        <input
+          type="number"
+          id="user_id"
+          class="form-control"
+          formControlName="user_id"
+        />
+        <div
+          *ngIf="
+            userForm.get('user_id')?.invalid && userForm.get('user_id')?.touched
+          "
+          class="text-danger"
+        >
+          User ID is required and must be a number.
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="user_name">Full Name</label>
+        <input
+          type="text"
+          id="user_name"
+          class="form-control"
+          formControlName="user_name"
+        />
+        <div
+          *ngIf="
+            userForm.get('user_name')?.invalid &&
+            userForm.get('user_name')?.touched
+          "
+          class="text-danger"
+        >
+          Full Name is required (Max: 100 characters).
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="phone">Phone</label>
+        <input
+          type="number"
+          id="phone"
+          class="form-control"
+          formControlName="phone"
+        />
+        <div
+          *ngIf="
+            userForm.get('phone')?.invalid && userForm.get('phone')?.touched
+          "
+          class="text-danger"
+        >
+          Phone is required and must be a number.
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="address">Address</label>
+        <textarea
+          id="address"
+          class="form-control"
+          formControlName="address"
+        ></textarea>
+        <div
+          *ngIf="
+            userForm.get('address')?.invalid && userForm.get('address')?.touched
+          "
+          class="text-danger"
+        >
+          Address is required.
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="image">Upload Image</label>
+        <input
+          type="file"
+          id="image"
+          class="form-control"
+          (change)="onFileChange($event)"
+        />
+        <div
+          *ngIf="
+            userForm.get('image')?.invalid && userForm.get('image')?.touched
+          "
+          class="text-danger"
+        >
+          Image is required.
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="userForm.invalid"
+      >
+        Submit
+      </button>
+    </form>
+  </div>
+</ng-template>

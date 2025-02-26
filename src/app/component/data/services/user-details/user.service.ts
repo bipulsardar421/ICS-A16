@@ -13,17 +13,42 @@ export class UserService {
   private authService = inject(AuthService);
 
   private userdetails: string = `${this.apiService.getBaseUrl()}/userdetails`;
-  // private genOtpUrl: string = `${this.apiService.getBaseUrl()}/login/gen-otp`;
-  // private matchOtpUrl: string = `${this.apiService.getBaseUrl()}/login/match-otp`;
-  // private changePwdUrl: string = `${this.apiService.getBaseUrl()}/login/change-pwd`;
-
+  private userDetailsWithId: string = `${this.apiService.getBaseUrl()}/userdetails/get`;
+  private userDetailsAdd: string = `${this.apiService.getBaseUrl()}/userdetails/add`;
+  private userDetailsUpdate: string = `${this.apiService.getBaseUrl()}/userdetails/update`;
 
   getDetails(): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    return this.http.post(this.userdetails, {}, {
+    return this.http.post(
+      this.userdetails,
+      {},
+      {
+        headers,
+        withCredentials: true,
+      }
+    );
+  }
+  getDetailsWithId(id: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.userDetailsWithId, id, {
       headers,
       withCredentials: true,
     });
   }
 
+  addDetails(formdata: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.userDetailsAdd, formdata, {
+      headers,
+      withCredentials: true,
+    });
+  }
+
+  editDetails(formdata: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.userDetailsUpdate, formdata, {
+      headers,
+      withCredentials: true,
+    });
+  }
 }

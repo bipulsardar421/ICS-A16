@@ -77,7 +77,7 @@ export class AuthService {
         tap(() => {
           this.isAuthenticatedSubject.next(false);
           this.userRoleSubject.next(null);
-          this.sessionCheckedSubject.next(false); // Reset session check
+          this.sessionCheckedSubject.next(false);
         }),
         catchError((error) => {
           console.error('Logout failed', error);

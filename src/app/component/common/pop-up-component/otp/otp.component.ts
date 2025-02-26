@@ -60,10 +60,10 @@ export class OtpComponent {
         next: (response) => {
           this.alertService.hideLoading();
           if (response.status !== 'error') {
-            this.alertService.showAlert('success', 'Please Continue to Login.');
+            this.alertService.showAlert('success', 'Successfully Signed In');
             setTimeout(() => {
               this.ngbModalService.dismissAll();
-              this.modalService.triggerOpenModal(ModalType.LOGIN);
+              this.router.navigate(['/main']);
             }, 1000);
           } else {
             this.alertService.showAlert('danger', response.message);
