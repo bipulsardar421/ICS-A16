@@ -1,22 +1,38 @@
-<section id="vendor" class="container mt-5 pt-5 shadow-">
+    <section id="vendor" class="container shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 class="fw-semibold">VENDORS</h2>
-        <button (click)="addVendor()" class="btn btn-dark rounded-circle px-3 py-2">+</button>
+        <button (click)="addVendor()" class="btn btn-dark rounded-circle px-3 py-2">
+        +
+        </button>
     </div>
-
+    <hr />
     <div class="row">
-        <div *ngFor="let vendor of vendors; let i = index" class="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <img [src]="vendor.image" alt="Vendor Image" class="img-fluid rounded-circle mb-2" style="width: 80px; height: 80px;">
-                    <h5 class="card-title">{{ vendor.name }}</h5>
-                    <p class="text-muted">{{ vendor.phone }}</p>
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-primary btn-sm">Manage</button>
-                        <button (click)="deleteVendor(i)" class="btn btn-danger btn-sm">Delete</button>
-                    </div>
-                </div>
+        <div
+        *ngFor="let vendor of vendors; let i = index"
+        class="col-12 col-sm-6 col-md-4 col-lg-2"
+        >
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+            <img
+                [src]="vendor.image"
+                alt="Vendor Image"
+                class="img-fluid rounded-circle mb-2"
+                style="width: 80px; height: 80px"
+            />
+            <h5 class="card-title">{{ vendor.user_name }}</h5>
+            <p class="text-muted">{{ vendor.phone }}</p>
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-primary btn-sm" (click)="editVendor(vendor)">
+                Manage
+                </button>
+                <button (click)="deleteVendor(i)" class="btn btn-danger btn-sm">
+                Delete
+                </button>
+            </div>
             </div>
         </div>
+        </div>
     </div>
-</section>
+    </section>
+
+    <app-add-edit-vendor></app-add-edit-vendor>

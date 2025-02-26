@@ -1,0 +1,27 @@
+.main-content {
+  height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.sidebar {
+  height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+ul.list-unstyled a {
+  text-decoration: none !important;
+  color: var(--sidebar-text, #007bff) !important;
+  transition: var(--transition) !important;
+}
+
+ul.list-unstyled a:hover {
+  color: var(--sidebar-hover-text, #0056b3) !important;
+  background-color: var(--sidebar-hover-bg, #f0f0f0) !important;
+}
+
+ul.list-unstyled li {
+  background-color: var(--sidebar-bg, #ffffff) !important;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+}

@@ -8,10 +8,11 @@ import { LoginComponent } from "../common/pop-up-component/login/login.component
 import { ForgotPwdComponent } from "../common/pop-up-component/forgot-pwd/forgot-pwd.component";
 import { ResetPwdComponent } from "../common/pop-up-component/reset-pwd/reset-pwd.component";
 import { SignupComponent } from "../common/pop-up-component/signup/signup.component";
+import { OtpComponent } from "../common/pop-up-component/otp/otp.component";
 
 @Component({
   selector: 'app-home',
-  imports: [WelcomeSectionComponent, ServicesSectionComponent, AboutSectionComponent, ContactSectionComponent, HomeNavBarComponent, LoginComponent, ForgotPwdComponent, ResetPwdComponent, SignupComponent],
+  imports: [WelcomeSectionComponent, ServicesSectionComponent, AboutSectionComponent, ContactSectionComponent, HomeNavBarComponent, LoginComponent, ForgotPwdComponent, ResetPwdComponent, SignupComponent, OtpComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

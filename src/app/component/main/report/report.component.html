@@ -1,46 +1,81 @@
-<main class="flex flex-col lg:flex-row mt-6 space-y-6 lg:space-y-0 lg:space-x-6 px-6"> 
-    <!-- Sidebar -->
-    <aside class="w-full lg:w-1/4 bg-white p-6 shadow-lg rounded-xl border border-gray-200">
-        <h2 class="text-gray-800 font-semibold text-lg mb-5">REPORT</h2>
-        <div class="mb-5">
-            <label class="block text-gray-600 font-medium mb-1" for="start-date">START DATE</label>
-            <input class="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring focus:ring-green-300 focus:outline-none" 
-                   id="start-date" type="date" />
-        </div>
-        <div class="mb-5">
-            <label class="block text-gray-600 font-medium mb-1" for="end-date">END DATE</label>
-            <input class="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring focus:ring-green-300 focus:outline-none" 
-                   id="end-date" type="date" />
-        </div>
-        <button class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg w-full hover:bg-green-600 transition">
-            GENERATE REPORT
-        </button>
-    </aside> 
-    
-    <!-- Main Content -->
-    <section class="w-full lg:w-3/4">
-        <div class="bg-white p-6 shadow-lg rounded-xl border border-gray-200">
-            <h2 class="text-gray-800 font-semibold text-xl mb-3">Sales Report</h2>
-            <p class="text-gray-600 mb-6">This report provides a summary of sales metrics for various products and regions.</p>
-            
-            <!-- Sales by Product -->
-            <div class="mb-8">
-                <h3 class="text-gray-800 font-semibold text-lg mb-3">Sales by Product</h3>
-                <img alt="Bar chart showing sales by product" class="w-full rounded-md shadow-sm border border-gray-300"
-                     src="https://placehold.co/600x400" />
-            </div> 
-            
-            <!-- Sales by Region -->
-            <div>
-                <h3 class="text-gray-800 font-semibold text-lg mb-3">Sales by Region</h3>
-                <img alt="Pie chart showing sales by region" class="w-full rounded-md shadow-sm border border-gray-300"
-                     src="https://placehold.co/600x400" />
-            </div>
-        </div>
-    </section>
-</main>
+<div class="d-flex h-100">
+  <div class="col-12 col-md-3 bg-white shadow-sm overflow-auto p-3 mt-4">
+    <div class="border-bottom mb-3">
+      <h5 class="font-weight-bold">Generate Report</h5>
+    </div>
 
-<!-- Floating Print Button -->
-<button class="fixed bottom-6 right-6 bg-gray-800 p-4 rounded-full shadow-md hover:bg-gray-900 transition">
-    <i class="fas fa-print text-white text-lg"></i>
-</button>
+    <form [formGroup]="reportForm" (ngSubmit)="generateReport()">
+      <div class="mb-4">
+        <label for="startDate" class="form-label">Select Start Date</label>
+        <input
+          id="startDate"
+          class="form-control"
+          type="date"
+          formControlName="startDate"
+          [max]="maxDate"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="endDate" class="form-label">Select End Date</label>
+        <input
+          id="endDate"
+          class="form-control"
+          type="date"
+          formControlName="endDate"
+          [max]="maxDate"
+        />
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="reportForm.invalid"
+      >
+        Generate Report
+      </button>
+    </form>
+  </div>
+
+  <!-- Main Content -->
+  <div class="col-12 col-md-9 p-4 bg-light">
+    <div class="bg-white p-5 shadow-sm position-relative">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3 class="font-weight-bold">
+            Report for {{ selectedDate | date : "longDate" }}
+          </h3>
+        </div>
+      </div>
+
+      <!-- Dynamic Report Content -->
+      <div *ngIf="reportData.length > 0; else noData">
+        <table class="table table-bordered mb-4">
+          <thead>
+            <tr>
+              <th class="text-left">DESCRIPTION</th>
+              <th class="text-right">AMOUNT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.description }}</td>
+              <td class="text-right">${{ item.amount.toFixed(2) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="text-right font-weight-bold">TOTAL</td>
+              <td class="text-right font-weight-bold">${{ getTotal() }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <ng-template #noData>
+        <p class="text-center text-muted">
+          No data available for the selected date.
+        </p>
+      </ng-template>
+    </div>
+  </div>
+</div>
