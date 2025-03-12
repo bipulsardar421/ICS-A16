@@ -14,14 +14,27 @@ export class InvoiceService {
   private authService = inject(AuthService);
 
   private getInvoice: string = `${this.apiService.getBaseUrl()}/invoice`;
-  // private genOtpUrl: string = `${this.apiService.getBaseUrl()}/login/gen-otp`;
-  // private matchOtpUrl: string = `${this.apiService.getBaseUrl()}/login/match-otp`;
-  // private changePwdUrl: string = `${this.apiService.getBaseUrl()}/login/change-pwd`;
+  private addInvoiceUrl: string = `${this.apiService.getBaseUrl()}/invoice/add`;
+  private iAmAdmin: string =`${this.apiService.getBaseUrl()}/invoice/iamAdmin`
 
 
   getInvoiceDetails(user_id: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
     return this.http.post(this.getInvoice, user_id, {
+      headers,
+      withCredentials: true,
+    });
+  }
+  addInvoiceDetails(form: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.addInvoiceUrl, form, {
+      headers,
+      withCredentials: true,
+    });
+  }
+  getAll(): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.iAmAdmin, {}, {
       headers,
       withCredentials: true,
     });

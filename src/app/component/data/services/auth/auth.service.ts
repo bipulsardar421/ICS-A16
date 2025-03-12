@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   checkSession(): void {
-    console.log('Checking session...');
+    this.getUID().subscribe();
     this.http
       .post<{ status: string; message: string; role?: string }>(
         this.sessionCheckUrl,
@@ -40,11 +40,16 @@ export class AuthService {
         tap((response) => {
           const isAuthenticated = response.status === 'true';
           this.isAuthenticatedSubject.next(isAuthenticated);
-          this.userRoleSubject.next(isAuthenticated ? response.role ?? null : null);
+          this.userRoleSubject.next(
+            isAuthenticated ? response.role ?? null : null
+          );
           this.sessionCheckedSubject.next(true);
 
           console.log('Session check response:', response);
-          console.log('AuthService - isAuthenticated:', this.isAuthenticatedSubject.value);
+          console.log(
+            'AuthService - isAuthenticated:',
+            this.isAuthenticatedSubject.value
+          );
           console.log('AuthService - User role:', this.userRoleSubject.value);
         }),
         catchError((error) => {
@@ -87,12 +92,16 @@ export class AuthService {
       .subscribe();
   }
 
-  getUID():
-    Observable<any> {
+  getUID(): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    return this.http.post(this.getUserId, {}, {
-      headers,
-      withCredentials: true,
-    });
+    return this.http
+      .post(this.getUserId, {}, { headers, withCredentials: true })
+      .pipe(
+        tap((response: any) => {
+          if (response) {
+            localStorage.setItem('user_id', response.user_id);
+          }
+        })
+      );
   }
 }

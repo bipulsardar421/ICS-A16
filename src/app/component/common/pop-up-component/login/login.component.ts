@@ -3,6 +3,7 @@ import {
   TemplateRef,
   inject,
   OnInit,
+  OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { ModalService, ModalType } from '../../../data/services/modal.service';
@@ -15,10 +16,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { UsersInterface } from '../../../data/interfaces/users.interface';
-import { FormDataConverter } from '../../../data/helper/formdata.helper';
 import { AlertService } from '../../../data/services/alert.service';
 import { LoginService } from '../../../data/services/login/login.service';
+import { Subscription } from 'rxjs';
+import { FormDataConverter } from '../../../data/helper/formdata.helper';
 
 @Component({
   selector: 'app-login',
@@ -26,30 +27,39 @@ import { LoginService } from '../../../data/services/login/login.service';
   styleUrl: './login.component.css',
   imports: [CommonModule, ReactiveFormsModule],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
   private fb = inject(FormBuilder);
-  loginForm: FormGroup;
+  loginForm!: FormGroup;
+  private modalSubscription!: Subscription;
 
   @ViewChild('loginModal') loginModalContent?: TemplateRef<any>;
 
   constructor(
     private alertService: AlertService,
     private loginService: LoginService
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+
+    this.modalSubscription = this.modalService.openModalEvent.subscribe(
+      (modalType: ModalType) => {
+        if (modalType === ModalType.LOGIN) {
+          this.openModal();
+        }
+      }
+    );
   }
 
-  ngOnInit() {
-    this.modalService.openModalEvent.subscribe((modalType: ModalType) => {
-      if (modalType === ModalType.LOGIN) {
-        this.openModal();
-      }
-    });
+  ngOnDestroy() {
+    if (this.modalSubscription) {
+      this.modalSubscription.unsubscribe();
+    }
   }
 
   onLogin() {
@@ -57,13 +67,17 @@ export class LoginComponent implements OnInit {
       console.warn('Form is invalid');
       return;
     }
-    this.loginForm.addControl('operation', new FormControl('login'));
+
+    if (!this.loginForm.contains('operation')) {
+      this.loginForm.addControl('operation', new FormControl('login'));
+    }
+
     const formData = FormDataConverter.toFormData(this.loginForm);
     this.alertService.showLoading();
+
     this.loginService.login(formData).subscribe({
       next: (response) => {
         this.alertService.hideLoading();
-        console.log('response from api', response);
         if (response.status !== 'error') {
           this.alertService.showAlert('success', response.message);
           this.getOtp();
@@ -71,33 +85,45 @@ export class LoginComponent implements OnInit {
           this.alertService.showAlert('danger', response.message);
         }
       },
-      error: (error) => {
-        console.error('Signup failed', error);
+      error: () => {
+        this.alertService.hideLoading();
+        this.alertService.showAlert('danger', 'Server Unavailable!');
       },
     });
   }
 
   getOtp() {
-    this.closeModal();
+    if (!this.loginForm?.controls['username']) {
+      console.error('Login form is not initialized properly');
+      return;
+    }
+
     this.modalService.dataTransferer({
       type: 'login',
       email: this.loginForm.controls['username'].value,
     });
+    this.closeModal();
     this.modalService.triggerOpenModal(ModalType.OTP);
   }
 
   openModal() {
-    if (this.loginModalContent) {
-      this.ngbModalService.open(this.loginModalContent, {
-        ariaLabelledBy: 'modal-basic-title',
-      });
+    if (!this.loginModalContent) {
+      console.warn('loginModalContent is not available yet');
+      return;
     }
+    this.loginForm?.reset();
+    this.ngbModalService.open(this.loginModalContent, {
+      ariaLabelledBy: 'modal-basic-title',
+    });
   }
+
   closeModal() {
-    if (this.loginModalContent) {
+    this.loginForm?.reset();
+    if (this.ngbModalService.hasOpenModals()) {
       this.ngbModalService.dismissAll();
     }
   }
+
   openForgotPwdModal() {
     this.modalService.triggerOpenModal(ModalType.FORGOTPWD);
   }

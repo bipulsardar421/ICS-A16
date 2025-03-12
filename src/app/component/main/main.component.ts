@@ -12,10 +12,18 @@ import { UserDetailsComponent } from '../common/pop-up-component/user-details/us
 import { AuthService } from '../data/services/auth/auth.service';
 import { AlertService } from '../data/services/alert.service';
 import { BehaviorSubject, map } from 'rxjs';
+import { AddEditProductComponent } from '../common/pop-up-component/add-edit-product/add-edit-product.component';
+import { AddEditVendorComponent } from "../common/pop-up-component/add-edit-vendor/add-edit-vendor.component";
 
 @Component({
   selector: 'app-main',
-  imports: [MainNavigationComponent, RouterOutlet, UserDetailsComponent],
+  imports: [
+    MainNavigationComponent,
+    RouterOutlet,
+    UserDetailsComponent,
+    AddEditProductComponent,
+    AddEditVendorComponent
+],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css',
 })
@@ -39,13 +47,8 @@ export class MainComponent implements OnInit {
     private _auth: AuthService
   ) {}
   ngOnInit(): void {
-    this._auth.getUID().subscribe({
-      next: (data: any) => {
-        localStorage.setItem('user_id', data.user_id);
-      },
-    });
-
-    this.checkUserIsNew(localStorage.getItem('user_id'));
+    const id = localStorage.getItem('user_id');
+    this.checkUserIsNew(id);
   }
 
   checkUserIsNew(id: any): void {
@@ -62,9 +65,10 @@ export class MainComponent implements OnInit {
             'Please complete your profile to proceed!'
           );
           this.openModel();
+          this.modalService.dataTransferer(id);
         } else if (response.length > 0) {
           const user = response[0];
-          localStorage.setItem("user_details", JSON.stringify(user));
+          localStorage.setItem('user_details', JSON.stringify(user));
           this.userData.next({
             name: user.user_name || 'Guest',
             role: user.role || 'Client',
