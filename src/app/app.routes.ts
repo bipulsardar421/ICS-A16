@@ -8,6 +8,7 @@ import { AdminComponent } from './component/main/admin/admin.component';
 import { authGuard } from '../app/component/data/auth-guard/auth.guard';
 import { roleGuard } from '../app/component/data/role-guard/role.guard';
 import { InvoiceGeneratorComponent } from './component/main/invoice-generator/invoice-generator.component';
+import { VendorBillComponent } from './component/main/vendor-bill/vendor-bill.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -19,6 +20,10 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'invoice', component: InvoiceComponent },
+      {
+        path: 'bill',
+        component: VendorBillComponent,
+      },
       { path: 'report', component: ReportComponent },
       { path: 'home', component: MainHomeComponent },
       {

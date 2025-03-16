@@ -1,9 +1,9 @@
 import { CommonModule, CurrencyPipe, NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { InvoiceService } from '../../data/services/invoice/invoice.service';
-import { AuthService } from '../../data/services/auth/auth.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, map } from 'rxjs';
+import { InvoiceService } from '../../data/services/invoice/invoice.service';
+import { AuthService } from '../../data/services/auth/auth.service';
 
 @Component({
   selector: 'app-invoice',
@@ -18,8 +18,13 @@ export class InvoiceComponent implements OnInit {
   user_details: any = null;
   invoices: any[] = [];
   filteredInvoices: any[] = [];
+  paginatedInvoices: any[] = [];
   selectedInvoice: any = null;
   searchForm!: FormGroup;
+
+  invoicesPerPage = 10;
+  currentPage = 1;
+  showMoreVisible = false;
 
   company = {
     name: 'ICS Application',
@@ -28,16 +33,8 @@ export class InvoiceComponent implements OnInit {
     phone: '+91 7749879756',
   };
 
-  client: any = {
-    name: '',
-    phone: '',
-  };
-
-  invoiceDetails: any = {
-    id: '',
-    date: '',
-    items: [],
-  };
+  client: any = {};
+  invoiceDetails: any = {};
 
   constructor(
     private invoiceService: InvoiceService,
@@ -50,6 +47,7 @@ export class InvoiceComponent implements OnInit {
     if (userData) {
       this.user_details = JSON.parse(userData);
       this.getUserInvoices();
+      console.log(this.paginatedInvoices);
     }
 
     this.searchForm = this.fb.group({
@@ -62,9 +60,7 @@ export class InvoiceComponent implements OnInit {
         debounceTime(300),
         map((query) => query.trim().toLowerCase())
       )
-      .subscribe((query) => {
-        this.filterInvoices(query);
-      });
+      .subscribe((query) => this.filterInvoices(query));
   }
 
   getUserInvoices() {
@@ -78,6 +74,7 @@ export class InvoiceComponent implements OnInit {
               if (response.status !== 'error' && Array.isArray(response)) {
                 this.invoices = response;
                 this.filteredInvoices = [...this.invoices];
+                this.resetPagination();
                 if (this.filteredInvoices.length > 0) {
                   this.selectInvoice(this.filteredInvoices[0]);
                 }
@@ -95,7 +92,9 @@ export class InvoiceComponent implements OnInit {
             next: (response) => {
               if (response.status !== 'error' && Array.isArray(response)) {
                 this.invoices = response;
+
                 this.filteredInvoices = [...this.invoices];
+                this.resetPagination();
                 if (this.filteredInvoices.length > 0) {
                   this.selectInvoice(this.filteredInvoices[0]);
                 }
@@ -114,66 +113,52 @@ export class InvoiceComponent implements OnInit {
   }
 
   filterInvoices(query: string) {
-    this.filteredInvoices = this.invoices.filter((invoice) => {
-      const invoiceId = invoice.invoice_id ? String(invoice.invoice_id) : '';
-
-      return invoiceId.includes(query);
-    });
-    if (this.filteredInvoices.length > 0) {
-      this.selectInvoice(this.filteredInvoices[0]);
-    } else {
-      this.selectedInvoice = null;
-      this.client = { name: '', phone: '' };
-      this.invoiceDetails = { id: '', date: '', items: [] };
-    }
+    this.filteredInvoices = this.invoices.filter((invoice) =>
+      JSON.stringify(invoice).toLowerCase().includes(query)
+    );
+    this.resetPagination();
   }
 
+  resetPagination() {
+    this.currentPage = 1;
+    console.log('Filtered Invoices:', this.filteredInvoices);
+    this.paginatedInvoices = this.filteredInvoices.slice(
+      0,
+      this.invoicesPerPage
+    );
+    this.showMoreVisible =
+      this.filteredInvoices.length > this.paginatedInvoices.length;
+  }
+  loadMore() {
+    const nextPageInvoices = this.filteredInvoices.slice(
+      this.currentPage * this.invoicesPerPage,
+      (this.currentPage + 1) * this.invoicesPerPage
+    );
+
+    this.paginatedInvoices = [...this.paginatedInvoices, ...nextPageInvoices];
+    this.currentPage++;
+
+    this.showMoreVisible =
+      this.paginatedInvoices.length < this.filteredInvoices.length;
+  }
   selectInvoice(invoice: any) {
-    this.selectedInvoice = invoice;
-
     this.client = {
-      name: invoice.customer_name || 'N/A',
-      phone: invoice.customer_contact || 'N/A',
+      name: invoice.customer_name,
+      phone: invoice.customer_contact,
     };
-
-    this.invoiceDetails = {
-      id: invoice.invoice_id,
-      date: invoice.invoice_date,
-      items: invoice.items.map((item: any) => ({
-        description: item.product_name,
-        amount: item.total_price,
-      })),
-    };
+    this.invoiceDetails = { ...invoice };
   }
 
   getTotal() {
-    return this.invoiceDetails.items
-      .reduce((sum: number, item: any) => sum + item.amount, 0)
-      .toFixed(2);
+    return (
+      this.invoiceDetails.items?.reduce(
+        (sum: any, item: any) => sum + item.total_price,
+        0
+      ) || 0
+    );
   }
 
   printInvoice() {
-    const invoiceElement = document.querySelector('.main-content');
-    if (invoiceElement) {
-      const printWindow = window.open('', '', 'width=800,height=600');
-      printWindow?.document.write(`
-        <html>
-          <head>
-            <title>Invoice</title>
-            <style>
-              body { font-family: Arial, sans-serif; }
-              .main-content { width: 100%; padding: 20px; }
-            </style>
-          </head>
-          <body>
-            ${invoiceElement.outerHTML}
-          </body>
-        </html>
-      `);
-      printWindow?.document.close();
-      printWindow?.focus();
-      printWindow?.print();
-      printWindow?.close();
-    }
+    window.print();
   }
 }

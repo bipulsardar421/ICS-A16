@@ -1,4 +1,4 @@
-import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, TemplateRef, ViewChild, OnDestroy } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -12,8 +12,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { UsersInterface } from '../../../data/interfaces/users.interface';
 import { LoginService } from '../../../data/services/login/login.service';
-import { FormDataConverter } from '../../../data/helper/formdata.helper';
 import { AlertService } from '../../../data/services/alert.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-add-edit-vendor',
@@ -21,7 +21,7 @@ import { AlertService } from '../../../data/services/alert.service';
   templateUrl: './add-edit-vendor.component.html',
   styleUrl: './add-edit-vendor.component.css',
 })
-export class AddEditVendorComponent {
+export class AddEditVendorComponent implements OnDestroy {
   @ViewChild('addEditVendor') addEditVendor!: TemplateRef<any>;
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
@@ -30,6 +30,8 @@ export class AddEditVendorComponent {
   userForm!: FormGroup;
   users: any[] = [];
   initialState: any[] = [];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private fb: FormBuilder,
@@ -42,21 +44,32 @@ export class AddEditVendorComponent {
   }
 
   ngOnInit() {
-    this.modalService.openModalEvent.subscribe((modalType: ModalType) => {
-      if (modalType === ModalType.VENDOR) {
-        this.openModal();
-      }
-    });
-    this.modalService.dataTransferObject.subscribe((dto: any) => {
-      if (dto != null) {
-        this.what = dto.type;
-        if (dto.type === 'edit') {
-          this.dto = dto.data;
+    this.subscriptions.add(
+      this.modalService.openModalEvent.subscribe((modalType: ModalType) => {
+        if (modalType === ModalType.VENDOR) {
+          this.openModal();
         }
-      }
-    });
+      })
+    );
+
+    this.subscriptions.add(
+      this.modalService.dataTransferObject.subscribe((dto: any) => {
+        if (dto != null) {
+          this.what = dto.type;
+          if (dto.type === 'edit') {
+            this.dto = dto.data;
+          }
+        }
+      })
+    );
+
     this.fetchUsers();
   }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   fetchUsers(): void {
     const fd = new FormData();
     this._alert.showLoading();
@@ -66,21 +79,23 @@ export class AddEditVendorComponent {
     } else {
       console.error('User ID not found in localStorage');
     }
-    this._login.getUserDetails(fd).subscribe({
-      next: (apiResponse) => {
-        this._alert.hideLoading();
-        this.users = this.processUsers(apiResponse);
-        this.initializeForm();
-        this.storeInitialState();
-      },
-      error: (err) => {
-        this._alert.hideLoading();
-        this._alert.showAlert(
-          'danger',
-          'Something Went Wrong, please try again!!'
-        );
-      },
-    });
+    this.subscriptions.add(
+      this._login.getUserDetails(fd).subscribe({
+        next: (apiResponse) => {
+          this._alert.hideLoading();
+          this.users = this.processUsers(apiResponse);
+          this.initializeForm();
+          this.storeInitialState();
+        },
+        error: (err) => {
+          this._alert.hideLoading();
+          this._alert.showAlert(
+            'danger',
+            'Something Went Wrong, please try again!!'
+          );
+        },
+      })
+    );
   }
 
   processUsers(usersArray: any[]): any[] {
@@ -160,33 +175,33 @@ export class AddEditVendorComponent {
       ])
       .filter((role: any) => role !== null);
 
-    console.log(updatedUsers);
-
     const formData = new FormData();
-
     formData.append('data', JSON.stringify(updatedUsers));
 
-    this._login.editUserRole(formData).subscribe({
-      next: (res) => {
-        this._alert.hideLoading();
-        this._alert.showAlert('success', 'Role Updated!');
-        this.users = [];
-        this.initialState = [];
-        this.fetchUsers();
-      },
-      error: (err) => {
-        this._alert.hideLoading();
-        this._alert.showAlert(
-          'danger',
-          'Something went wrong, please try again!'
-        );
-      },
-    });
+    this.subscriptions.add(
+      this._login.editUserRole(formData).subscribe({
+        next: (res) => {
+          this._alert.hideLoading();
+          this._alert.showAlert('success', 'Role Updated!');
+          this.users = [];
+          this.initialState = [];
+          this.fetchUsers();
+        },
+        error: (err) => {
+          this._alert.hideLoading();
+          this._alert.showAlert(
+            'danger',
+            'Something went wrong, please try again!'
+          );
+        },
+      })
+    );
   }
 
   getUsersControls() {
     return (this.userForm.get('users') as FormArray).controls;
   }
+
   openModal() {
     if (this.addEditVendor) {
       this.ngbModalService.open(this.addEditVendor, {

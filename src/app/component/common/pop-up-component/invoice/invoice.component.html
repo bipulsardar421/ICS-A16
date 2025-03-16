@@ -11,31 +11,6 @@
   <div class="modal-body">
     <form [formGroup]="invoiceForm" (ngSubmit)="submitForm()">
       <div class="mb-3">
-        <label class="form-label">Customer Type</label>
-        <div class="form-check">
-          <input
-            type="radio"
-            class="form-check-input"
-            name="customerType"
-            value="self"
-            (change)="onCustomerTypeChange('self')"
-            [checked]="customerType === 'self'"
-          />
-          <label class="form-check-label">Self</label>
-        </div>
-        <div class="form-check">
-          <input
-            type="radio"
-            class="form-check-input"
-            name="customerType"
-            value="someone_else"
-            (change)="onCustomerTypeChange('someone_else')"
-            [checked]="customerType === 'someone_else'"
-          />
-          <label class="form-check-label">Someone Else</label>
-        </div>
-      </div>
-      <div class="mb-3">
         <label class="form-label">Customer Name</label>
         <input
           type="text"
@@ -89,23 +64,27 @@
           formControlName="grand_total"
         />
       </div>
+      <div *ngIf="userRole$ | async as userRole">
+        <div class="mb-3" *ngIf="userRole === 'admin' || userRole === 'vendor'">
+          <label class="form-label">Payment Status</label>
+          <select class="form-select" formControlName="payment_status">
+            <option
+              *ngFor="let status of paymentStatusOptions"
+              [value]="status"
+            >
+              {{ status }}
+            </option>
+          </select>
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label">Payment Status</label>
-        <select class="form-select" formControlName="payment_status">
-          <option *ngFor="let status of paymentStatusOptions" [value]="status">
-            {{ status }}
-          </option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Payment Method</label>
-        <select class="form-select" formControlName="payment_method">
-          <option *ngFor="let method of paymentMethods" [value]="method">
-            {{ method }}
-          </option>
-        </select>
+        <div class="mb-3" *ngIf="userRole === 'admin' || userRole === 'vendor'">
+          <label class="form-label">Payment Method</label>
+          <select class="form-select" formControlName="payment_method">
+            <option *ngFor="let method of paymentMethods" [value]="method">
+              {{ method }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="mb-3">
@@ -117,13 +96,89 @@
         ></textarea>
       </div>
 
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="invoiceForm.invalid"
-      >
-        Submit
-      </button>
+      <div *ngIf="userRole$ | async as userRole">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="invoiceForm.invalid"
+          *ngIf="userRole === 'admin' || userRole === 'vendor'"
+        >
+          Submit
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          *ngIf="userRole === 'client'"
+          (click)="openPaymentPopup()"
+        >
+          Proceed to pay
+        </button>
+      </div>
     </form>
+  </div>
+</ng-template>
+<ng-template #paymentModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Payment</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="invoiceForm">
+      <div class="form-group">
+        <input
+        type="hidden"
+        formControlName="payment_status"
+        [value]="'Paid'"
+      />
+      </div>
+      <div class="form-group mt-3">
+        <label>Payment Method</label>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            value="Credit Card"
+            formControlName="payment_method"
+          />
+          <label class="form-check-label">Credit Card</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            value="UPI"
+            formControlName="payment_method"
+          />
+          <label class="form-check-label">UPI</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="radio"
+            value="Bank Transfer"
+            formControlName="payment_method"
+          />
+          <label class="form-check-label">Bank Transfer</label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="modal.dismiss('Close click')"
+    >
+      Close
+    </button>
+    <button type="button" class="btn btn-success" (click)="userPayment()">
+      <!-- NOte to self, integrate payment gateway, logic >>> paid?setValue('paid'):setValue('cancelled') -->
+      Pay
+    </button>
   </div>
 </ng-template>
