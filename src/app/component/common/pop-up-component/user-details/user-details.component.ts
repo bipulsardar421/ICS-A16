@@ -18,6 +18,7 @@ import { ModalService, ModalType } from '../../../data/services/modal.service';
 import { UserService } from '../../../data/services/user-details/user.service';
 import { FormDataConverter } from '../../../data/helper/formdata.helper';
 import { AlertService } from '../../../data/services/alert.service';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-details',
@@ -28,6 +29,7 @@ import { AlertService } from '../../../data/services/alert.service';
 export class UserDetailsComponent implements OnInit {
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
+  private router = inject(Router);
 
   userForm: FormGroup;
   selectedFile: File | null = null;
@@ -35,7 +37,6 @@ export class UserDetailsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private _user: UserService,
     private alertService: AlertService
   ) {
@@ -52,6 +53,11 @@ export class UserDetailsComponent implements OnInit {
     this.modalService.openModalEvent.subscribe((modalType: ModalType) => {
       if (modalType === ModalType.USER) {
         this.openModal();
+      }
+    });
+    this.modalService.dataTransferObject.subscribe((data: any) => {
+      if (data != null) {
+        this.userForm.controls['user_id'].patchValue(data);
       }
     });
   }
@@ -76,7 +82,9 @@ export class UserDetailsComponent implements OnInit {
         if (response.status !== 'error') {
           this.alertService.showAlert('success', response.message);
           setTimeout(() => {
-            this.closeModal;
+            this.closeModal();
+            window.location.reload();
+            this.router.navigate(['/main']);
           }, 1000);
         } else {
           this.alertService.showAlert('danger', response.message);

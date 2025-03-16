@@ -17,6 +17,10 @@ import { CommonModule } from '@angular/common';
 import { CartItem } from '../../../data/interfaces/cart.interface';
 import { AuthService } from '../../../data/services/auth/auth.service';
 import { CartService } from '../../../data/services/cart/cart.service';
+import { FormDataConverter } from '../../../data/helper/formdata.helper';
+import { InvoiceService } from '../../../data/services/invoice/invoice.service';
+import { AlertService } from '../../../data/services/alert.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-invoice',
@@ -27,12 +31,13 @@ import { CartService } from '../../../data/services/cart/cart.service';
 export class InvoiceComponent implements OnInit {
   authService = inject(AuthService);
   userRole$ = this.authService.userRole$;
+  private router = inject(Router);
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
 
-  private user_details: any = localStorage.getItem("user_details")
-  ? JSON.parse(localStorage.getItem("user_details")!)
-  : null;
+  private user_details: any = localStorage.getItem('user_details')
+    ? JSON.parse(localStorage.getItem('user_details')!)
+    : null;
 
   invoiceForm!: FormGroup;
   paymentStatusOptions = ['Pending', 'Paid', 'Cancelled'];
@@ -42,7 +47,12 @@ export class InvoiceComponent implements OnInit {
   customerType = 'self';
   @ViewChild('invoice_modal') invoice_modalContent!: TemplateRef<any>;
 
-  constructor(private fb: FormBuilder,public _cartService: CartService) {}
+  constructor(
+    private fb: FormBuilder,
+    public _cartService: CartService,
+    private _invoiceService: InvoiceService,
+    private _alert: AlertService
+  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -69,10 +79,16 @@ export class InvoiceComponent implements OnInit {
         [Validators.required, Validators.maxLength(20)],
       ],
       invoice_date: [currentDate, Validators.required],
-      total_amount: [this._cartService.getTotalPrice(), [Validators.required, Validators.min(0)]],
+      total_amount: [
+        this._cartService.getTotalPrice(),
+        [Validators.required, Validators.min(0)],
+      ],
       discount: [0, [Validators.min(0)]],
       tax: [0, [Validators.min(0)]],
-      grand_total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      grand_total: [
+        { value: 0, disabled: true },
+        [Validators.required, Validators.min(0)],
+      ],
       payment_status: ['Pending', Validators.required],
       payment_method: ['', [Validators.required, Validators.maxLength(4)]],
       notes: [''],
@@ -106,15 +122,30 @@ export class InvoiceComponent implements OnInit {
     const tax = this.invoiceForm.get('tax')?.value || 0;
     const discountedAmount = totalAmount - (totalAmount * discount) / 100;
     const grandTotal = discountedAmount + (discountedAmount * tax) / 100;
-    this.invoiceForm.patchValue({ grand_total: grandTotal.toFixed(2) }, { emitEvent: false });
+    this.invoiceForm.patchValue(
+      { grand_total: grandTotal.toFixed(2) },
+      { emitEvent: false }
+    );
   }
   submitForm(): void {
-    console.log(JSON.stringify(this.products));
-
     if (this.invoiceForm.valid) {
-      console.log('Form Data:', this.invoiceForm.value);
+      const formData = FormDataConverter.toFormData(this.invoiceForm);
+      formData.append('cartData', JSON.stringify(this.products));
+      this._alert.showLoading();
+      this._invoiceService.addInvoiceDetails(formData).subscribe({
+        next: (response) => {
+          this._alert.hideLoading();
+          this._alert.showAlert('success', response.message);
+          this.closeModal();
+          this._cartService.resetCart();
+          this.router.navigate(['/main/home']);
+        },
+        error: (error) => {
+          this._alert.showAlert('danger', error.message);
+        },
+      });
     } else {
-      console.log('Form is invalid');
+      this._alert.showAlert('danger', 'Please fill out the form fully!');
     }
   }
 

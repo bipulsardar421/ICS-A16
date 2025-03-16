@@ -52,4 +52,8 @@ export class CartService {
       0
     );
   }
+  resetCart() {
+    this.cartItems = [];
+    this.cartSubject.next([]);
+  }
 }

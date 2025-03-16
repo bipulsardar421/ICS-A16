@@ -1,1 +1,145 @@
-<p>add-edit-product works!</p>
+<ng-template #add_product let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{ what + " Product" }}</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form
+      [formGroup]="productForm"
+      (ngSubmit)="onSubmit()"
+      enctype="multipart/form-data"
+      class="container mt-4"
+    >
+      <div class="mb-3">
+        <label for="productName" class="form-label">Product Name:</label>
+        <input
+          type="text"
+          id="productName"
+          class="form-control"
+          formControlName="product_name"
+          placeholder="Enter product name"
+        />
+        <div
+          *ngIf="
+            productForm.get('product_name')?.invalid &&
+            productForm.get('product_name')?.touched
+          "
+          class="text-danger"
+        >
+          Product name is required.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Quantity:</label>
+        <input
+          type="number"
+          id="quantity"
+          class="form-control"
+          formControlName="quantity"
+          min="1"
+        />
+        <div
+          *ngIf="
+            productForm.get('quantity')?.invalid &&
+            productForm.get('quantity')?.touched
+          "
+          class="text-danger"
+        >
+          Quantity must be at least 1.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="rate" class="form-label">Rate:</label>
+        <input
+          type="number"
+          id="rate"
+          class="form-control"
+          formControlName="rate"
+          min="1"
+        />
+        <div
+          *ngIf="
+            productForm.get('rate')?.invalid && productForm.get('rate')?.touched
+          "
+          class="text-danger"
+        >
+          Rate must be a positive number.
+        </div>
+      </div>
+      <div *ngIf="userRole$ | async as userRole">
+        <div class="mb-3" *ngIf="userRole === 'admin'">
+          <label for="vendor" class="form-label">Vendor:</label>
+          <div class="input-group mb-3">
+            <select class="form-select" id="vendor" formControlName="vendors">
+              <option *ngFor="let vendor of vendorsList" [value]="vendor.id">
+                {{ vendor.name }}
+              </option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              productForm.get('vendors')?.invalid &&
+              productForm.get('vendors')?.touched
+            "
+            class="text-danger"
+          >
+            Please select at least one vendor.
+          </div>
+        </div>
+        <div class="mb-3" *ngIf="userRole === 'vendor'">
+          <label for="vendor" class="form-label">Vendor:</label>
+          <input
+          type="text"
+          id="vendors"
+          class="form-control"
+          formControlName="vendors"
+          readonly
+        />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="recievedDate" class="form-label">Received Date:</label>
+        <input
+          type="date"
+          id="recievedDate"
+          class="form-control"
+          formControlName="recieved_date"
+        />
+        <div
+          *ngIf="
+            productForm.get('recieved_date')?.invalid &&
+            productForm.get('recieved_date')?.touched
+          "
+          class="text-danger"
+        >
+          Please select a valid date.
+        </div>
+      </div>
+
+      <div class="mb-3" *ngIf="image">
+        <label for="image" class="form-label">Image:</label>
+        <input
+          type="file"
+          id="image"
+          class="form-control"
+          (change)="onFileChange($event)"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="productForm.invalid"
+      >
+        Submit
+      </button>
+    </form>
+  </div>
+</ng-template>

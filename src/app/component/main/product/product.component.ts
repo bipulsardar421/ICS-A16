@@ -1,19 +1,24 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { StockService } from '../../data/services/stock/stock.service';
 import { StockInterface } from '../../data/interfaces/stock.interface';
 import { CartItem } from '../../data/interfaces/cart.interface';
 import { CartService } from '../../data/services/cart/cart.service';
 import { RouterLink } from '@angular/router';
+import { ModalService, ModalType } from '../../data/services/modal.service';
+import { AuthService } from '../../data/services/auth/auth.service';
 
 @Component({
   selector: 'app-product',
-  imports: [CommonModule, FormsModule, RouterLink, ],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css',
 })
 export class ProductComponent implements OnInit {
+  private modalService = inject(ModalService);
+  authService = inject(AuthService);
+  userRole$ = this.authService.userRole$;
   Math = Math;
   products: StockInterface[] = [];
   qtyMap: { [productId: string]: number } = {};
@@ -68,5 +73,15 @@ export class ProductComponent implements OnInit {
     product.quantity -= qty;
 
     this.qtyMap[product.product_id] = 0;
+  }
+  edit(product: StockInterface) {
+    this.modalService.dataTransferer({
+      type: 'Edit',
+      product: product,
+    });
+    this.openProduct();
+  }
+  openProduct() {
+    this.modalService.triggerOpenModal(ModalType.PRODUCT);
   }
 }

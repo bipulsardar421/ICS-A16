@@ -1,6 +1,6 @@
 <div *ngIf="userRole$ | async as userRole">
-    <app-vendor *ngIf="userRole === 'admin'"></app-vendor>
+  <app-vendor *ngIf="userRole === 'admin'"></app-vendor>
 </div>
 <div>
-    <app-product></app-product>
+  <app-product></app-product>
 </div>

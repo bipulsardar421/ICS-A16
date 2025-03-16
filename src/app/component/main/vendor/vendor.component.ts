@@ -8,7 +8,7 @@ import { UsersInterface } from '../../data/interfaces/users.interface';
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule, AddEditVendorComponent],
+  imports: [CommonModule],
   templateUrl: './vendor.component.html',
   styleUrls: ['./vendor.component.css'],
 })
