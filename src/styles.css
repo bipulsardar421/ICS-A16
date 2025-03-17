@@ -85,3 +85,32 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   scrollbar-width: thin;
   scrollbar-color: #cccccc #f1f1f1; 
 }
+
+
+#navbar-brand {
+  position: relative;
+  text-decoration: none;
+}
+
+.popover-text {
+  visibility: hidden;
+  position: absolute;
+  left: 100%;
+  bottom: -35px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+#navbar-brand:hover .popover-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+

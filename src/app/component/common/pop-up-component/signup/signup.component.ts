@@ -104,6 +104,7 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   closeModal() {
     if (this.ngbModalService.hasOpenModals()) {
+      this.signUpForm.reset();
       this.ngbModalService.dismissAll();
     }
   }

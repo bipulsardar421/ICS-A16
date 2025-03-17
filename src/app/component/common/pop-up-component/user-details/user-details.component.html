@@ -1,6 +1,8 @@
 <ng-template #user_details let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Complete Your Profile Details</h4>
+    <h4 class="modal-title" id="modal-basic-title">
+      Complete Your Profile Details
+    </h4>
     <button
       type="button"
       class="btn-close"
@@ -35,7 +37,11 @@
           id="user_name"
           class="form-control"
           formControlName="user_name"
+          (input)="checkUserNameAvailability()"
         />
+        <div *ngIf="usernameTaken" class="text-danger">
+          Username is already taken. Please choose another.
+        </div>
         <div
           *ngIf="
             userForm.get('user_name')?.invalid &&
@@ -50,18 +56,22 @@
       <div class="form-group mb-3">
         <label for="phone">Phone</label>
         <input
-          type="number"
+          type="text"
           id="phone"
           class="form-control"
           formControlName="phone"
+          (input)="checkPhoneAvailability()"
         />
+        <div *ngIf="phoneTaken" class="text-danger">
+          This number already exists. Please choose another.
+        </div>
         <div
           *ngIf="
             userForm.get('phone')?.invalid && userForm.get('phone')?.touched
           "
           class="text-danger"
         >
-          Phone is required and must be a number.
+          Phone number must be exactly 10 digits.
         </div>
       </div>
 
@@ -90,13 +100,8 @@
           class="form-control"
           (change)="onFileChange($event)"
         />
-        <div
-          *ngIf="
-            userForm.get('image')?.invalid && userForm.get('image')?.touched
-          "
-          class="text-danger"
-        >
-          Image is required.
+        <div *ngIf="invalidImageFormat" class="text-danger">
+          Only JPG and PNG images are allowed.
         </div>
       </div>
 

@@ -56,7 +56,7 @@ export class OtpComponent implements OnInit, OnDestroy {
 
     this.dataTransferSubscription = this.modalService.dataTransferObject.subscribe((data: any) => {
       this.otpFor = data;
-      console.log(this.otpFor);
+      this.otpForm.reset();
     });
   }
 
@@ -77,6 +77,7 @@ export class OtpComponent implements OnInit, OnDestroy {
             this.alertService.showAlert('success', 'Successfully Signed In');
             setTimeout(() => {
               this.ngbModalService.dismissAll();
+              this._auth.checkSession();
               this.router.navigate(['/main/home']);
             }, 1000);
           } else {

@@ -16,6 +16,8 @@ export class UserService {
   private userDetailsWithId: string = `${this.apiService.getBaseUrl()}/userdetails/get`;
   private userDetailsAdd: string = `${this.apiService.getBaseUrl()}/userdetails/add`;
   private userDetailsUpdate: string = `${this.apiService.getBaseUrl()}/userdetails/update`;
+  private getcheckUserName: string = `${this.apiService.getBaseUrl()}/userdetails/checkUserName`;
+  private getcheckPhone: string = `${this.apiService.getBaseUrl()}/userdetails/checkPhone`;
 
   getDetails(): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
@@ -47,6 +49,20 @@ export class UserService {
   editDetails(formdata: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
     return this.http.post(this.userDetailsUpdate, formdata, {
+      headers,
+      withCredentials: true,
+    });
+  }
+  checkUserName(fd: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.getcheckUserName, fd, {
+      headers,
+      withCredentials: true,
+    });
+  }
+  checkPhone(fd: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(this.getcheckPhone, fd, {
       headers,
       withCredentials: true,
     });

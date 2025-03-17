@@ -4,11 +4,12 @@ import { ModalService, ModalType } from '../../data/services/modal.service';
 import { AddEditVendorComponent } from '../../common/pop-up-component/add-edit-vendor/add-edit-vendor.component';
 import { UserService } from '../../data/services/user-details/user.service';
 import { UsersInterface } from '../../data/interfaces/users.interface';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-vendor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgbPopoverModule],
   templateUrl: './vendor.component.html',
   styleUrls: ['./vendor.component.css'],
 })

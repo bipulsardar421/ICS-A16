@@ -30,8 +30,11 @@ export class UserDetailsComponent implements OnInit {
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
   private router = inject(Router);
-
+  invalidImageFormat = false;
   userForm: FormGroup;
+  usernameTaken = false;
+  phoneTaken = false;
+
   selectedFile: File | null = null;
   @ViewChild('user_details') user_detailsModalContent!: TemplateRef<any>;
 
@@ -43,7 +46,7 @@ export class UserDetailsComponent implements OnInit {
     this.userForm = this.fb.group({
       user_id: [{ value: localStorage.getItem('user_id'), disabled: true }],
       user_name: ['', [Validators.required, Validators.maxLength(100)]],
-      phone: [null, [Validators.required, Validators.pattern('^[0-9]*$')]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       address: ['', [Validators.required]],
       image: [null, Validators.required],
     });
@@ -63,8 +66,17 @@ export class UserDetailsComponent implements OnInit {
   }
   onFileChange(event: any) {
     if (event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
-      this.userForm.patchValue({ image: this.selectedFile });
+      const file = event.target.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png'];
+
+      if (!allowedTypes.includes(file.type)) {
+        this.invalidImageFormat = true;
+        this.userForm.get('image')?.setErrors({ invalidFormat: true });
+      } else {
+        this.invalidImageFormat = false;
+        this.selectedFile = file;
+        this.userForm.patchValue({ image: this.selectedFile });
+      }
     }
   }
 
@@ -95,7 +107,26 @@ export class UserDetailsComponent implements OnInit {
       },
     });
   }
-
+  checkUserNameAvailability() {
+    const username = this.userForm.get('user_name')?.value;
+    if (username.length > 0) {
+      const name = new FormData();
+      name.append('name', username);
+      this._user.checkUserName(name).subscribe((response: any[]) => {
+        this.usernameTaken = response.length > 0;
+      });
+    }
+  }
+  checkPhoneAvailability() {
+    const username = this.userForm.get('phone')?.value;
+    if (username.length > 0) {
+      const name = new FormData();
+      name.append('name', username);
+      this._user.checkPhone(name).subscribe((response: any[]) => {
+        this.phoneTaken = response.length > 0;
+      });
+    }
+  }
   openModal() {
     if (this.user_detailsModalContent) {
       this.ngbModalService.open(this.user_detailsModalContent, {
