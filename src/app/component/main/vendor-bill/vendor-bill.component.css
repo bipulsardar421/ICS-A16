@@ -1,0 +1,22 @@
+.main-content {
+  height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.sidebar {
+  height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+ul.list-unstyled {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+}
+ul.list-unstyled li {
+  transition: background-color 0.3s ease-in-out;
+}
+ul.list-unstyled li:hover {
+  background-color: #007bff;
+  color: rgb(209, 112, 254);
+}

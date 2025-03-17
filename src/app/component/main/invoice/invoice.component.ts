@@ -47,7 +47,6 @@ export class InvoiceComponent implements OnInit {
     if (userData) {
       this.user_details = JSON.parse(userData);
       this.getUserInvoices();
-      console.log(this.paginatedInvoices);
     }
 
     this.searchForm = this.fb.group({

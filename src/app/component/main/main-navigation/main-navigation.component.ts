@@ -13,7 +13,6 @@ import { AuthService } from '../../data/services/auth/auth.service';
 })
 export class MainNavigationComponent implements OnInit{
 private router = inject(Router)
-
   name: string = '';
   role: string = '';
   profile_image: string = '';

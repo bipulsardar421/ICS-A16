@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { InvoiceService } from '../../data/services/invoice/invoice.service';
+import { AuthService } from '../../data/services/auth/auth.service';
 
 interface BillItem {
   quantity: number;
@@ -23,63 +25,66 @@ export class VendorBillComponent implements OnInit {
   filteredBills: BillItem[] = [];
   selectedBillItems: BillItem[] = [];
   selectedBillDetails: any = null;
+  user_details: any = null;
+  authService = inject(AuthService);
+  userRole$ = this.authService.userRole$;
 
   searchForm!: FormGroup;
-
+  constructor(private _invoice: InvoiceService) {}
   ngOnInit(): void {
-    this.fetchBillData();
+    const userData = localStorage.getItem('user_details');
+    if (userData) {
+      this.user_details = JSON.parse(userData);
+      this.fetchBillData();
+    }
     this.initializeSearchForm();
-    this.filteredBills = this.billData; // For initial rendering
+    this.filteredBills = this.billData;
   }
 
   fetchBillData(): void {
-    this.billData = [
-      {
-        quantity: 3,
-        item_id: 1,
-        user_name: 'Bipul Sardar',
-        invoice_id: 1,
-        customer_name: 'Test Admin',
-        product_name: 'abc',
-        customer_contact: 12341234,
-      },
-      {
-        quantity: 3,
-        item_id: 3,
-        user_name: 'Bipul Sardar',
-        invoice_id: 1,
-        customer_name: 'Test Admin',
-        product_name: 'abc',
-        customer_contact: 12341234,
-      },
-      {
-        quantity: 5,
-        item_id: 19,
-        user_name: 'Bipul Sardar',
-        invoice_id: 5,
-        customer_name: 'Test Admin',
-        product_name: 'abc',
-        customer_contact: 12341234,
-      },
-      {
-        quantity: 2,
-        item_id: 13,
-        user_name: 'Bipul Sardar',
-        invoice_id: 4,
-        customer_name: 'Test Admin',
-        product_name: 'abc',
-        customer_contact: 12341234,
-      },
-      {
-        quantity: 11,
-        item_id: 38,
-        user_name: 'Bipul Sardar',
-        invoice_id: 11,
-        customer_name: 'Bipul Sardar',
-        product_name: 'Test From Browser',
-        customer_contact: 123456789,
-      },
-    ];
+    if (this.user_details?.user_id) {
+      const uid = new FormData();
+      uid.append('vendor_id', this.user_details.user_id);
+      this.userRole$.subscribe((role) => {
+        if (role === 'admin') {
+          this._invoice.getAllVendorBillOnlyForAdmin().subscribe({
+            next: (response: any) => {
+              if (response.status !== 'error' && Array.isArray(response)) {
+                this.billData = response;
+                this.filteredBills = [...this.billData];
+                if (this.filteredBills.length > 0) {
+                  this.selectBill(this.filteredBills[0].invoice_id);
+                }
+              } else {
+                this.billData = [];
+                this.filteredBills = [];
+              }
+            },
+            error: (error: any) => {
+              console.error('API Call Failed:', error);
+            },
+          });
+        } else {
+          this._invoice.getParticularBillForVendor(uid).subscribe({
+            next: (response: any) => {
+              if (response.status !== 'error' && Array.isArray(response)) {
+                this.billData = response;
+                this.filteredBills = [...this.billData];
+                if (this.filteredBills.length > 0) {
+                  this.selectBill(this.filteredBills[0].invoice_id);
+                }
+              } else {
+                this.billData = [];
+                this.filteredBills = [];
+              }
+            },
+            error: (error: any) => {
+              console.error('API Call Failed:', error);
+            },
+          });
+        }
+      });
+    }
   }
 
   initializeSearchForm(): void {
@@ -98,7 +103,8 @@ export class VendorBillComponent implements OnInit {
       (bill) =>
         bill.customer_name.toLowerCase().includes(searchTerm) ||
         bill.invoice_id.toString().includes(searchTerm) ||
-        bill.customer_contact.toString().includes(searchTerm)
+        bill.customer_contact.toString().includes(searchTerm) ||
+        bill.product_name.toLowerCase().includes(searchTerm)
     );
   }
 
@@ -118,6 +124,6 @@ export class VendorBillComponent implements OnInit {
     return this.selectedBillItems.reduce(
       (total, item) => total + item.quantity * 100,
       0
-    ); // Assuming unit price = 100
+    );
   }
 }
