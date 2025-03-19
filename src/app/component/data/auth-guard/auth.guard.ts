@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   console.log("AuthGuard triggered for route:", state.url);
 
   return combineLatest([authService.isAuthenticated$, authService.sessionChecked$]).pipe(
-    first(([isAuthenticated, sessionChecked]) => sessionChecked), // Wait until session is checked
+    first(([isAuthenticated, sessionChecked]) => sessionChecked),
     tap(([isAuthenticated]) => console.log("AuthGuard - isAuthenticated (after session check):", isAuthenticated)),
     map(([isAuthenticated]) => {
       if (isAuthenticated) {

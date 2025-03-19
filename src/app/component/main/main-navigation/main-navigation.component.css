@@ -54,3 +54,29 @@
   visibility: visible;
   opacity: 1;
 }
+
+.navbar-nav {
+  display: flex;
+}
+
+.navbar-nav .nav-item {
+  padding: 0 10px; /* Horizontal spacing */
+  position: relative; /* For pseudo-element positioning */
+}
+
+.navbar-nav .nav-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 50%; /* Shorter bar (adjust percentage as needed) */
+  background-color: #ccc;
+}
+
+/* Optional: Reduce nav-link height */
+.navbar-nav .nav-link {
+  padding: 0.25rem 0;
+  line-height: 1.2;
+}

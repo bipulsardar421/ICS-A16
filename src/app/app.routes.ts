@@ -9,6 +9,9 @@ import { authGuard } from '../app/component/data/auth-guard/auth.guard';
 import { roleGuard } from '../app/component/data/role-guard/role.guard';
 import { InvoiceGeneratorComponent } from './component/main/invoice-generator/invoice-generator.component';
 import { VendorBillComponent } from './component/main/vendor-bill/vendor-bill.component';
+import { ClientComponent } from './component/main/client/client.component';
+import { VendorComponent } from './component/main/vendor/vendor.component';
+import { NuserComponent } from './component/main/nuser/nuser.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -16,13 +19,25 @@ export const routes: Routes = [
     path: 'main',
     component: MainComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['client', 'admin', 'vendor'] },
+    data: { roles: ['nuser', 'admin'] },
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'invoice', component: InvoiceComponent },
       {
         path: 'bill',
         component: VendorBillComponent,
+      },
+      {
+        path: 'client',
+        component: ClientComponent,
+      },
+      {
+        path: 'vendor',
+        component: VendorComponent,
+      },
+      {
+        path:'nuser',
+        component:NuserComponent
       },
       { path: 'report', component: ReportComponent },
       { path: 'home', component: MainHomeComponent },

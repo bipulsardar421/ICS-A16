@@ -13,7 +13,7 @@ import { AuthService } from '../data/services/auth/auth.service';
 import { AlertService } from '../data/services/alert.service';
 import { BehaviorSubject, map } from 'rxjs';
 import { AddEditProductComponent } from '../common/pop-up-component/add-edit-product/add-edit-product.component';
-import { AddEditVendorComponent } from "../common/pop-up-component/add-edit-vendor/add-edit-vendor.component";
+import { AddEditVendorComponent } from "../common/pop-up-component/add-edit-users/add-edit-vendor.component";
 
 @Component({
   selector: 'app-main',

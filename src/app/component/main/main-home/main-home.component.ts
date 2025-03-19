@@ -6,7 +6,7 @@ import { AuthService } from '../../data/services/auth/auth.service';
 
 @Component({
   selector: 'app-main-home',
-  imports: [VendorComponent, ProductComponent, CommonModule],
+  imports: [ProductComponent, CommonModule],
   templateUrl: './main-home.component.html',
   styleUrl: './main-home.component.css',
 })

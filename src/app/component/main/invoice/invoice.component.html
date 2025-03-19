@@ -1,6 +1,9 @@
 <div class="d-flex" style="margin-top: 60px">
-   <!-- Sidebar -->
-   <div class="w-25 bg-white shadow-lg overflow-auto sidebar mt-4" style="margin-left: 5px">
+  <!-- Sidebar -->
+  <div
+    class="w-25 bg-white shadow-lg overflow-auto sidebar mt-4"
+    style="margin-left: 5px"
+  >
     <div class="p-3 border-bottom">
       <h1 class="h5 font-weight-bold">INVOICES</h1>
     </div>
@@ -10,7 +13,12 @@
       <div class="d-flex justify-content-center my-3">
         <form [formGroup]="searchForm" class="w-100">
           <div class="input-group w-100">
-            <input type="text" class="form-control" placeholder="Search..." formControlName="search" />
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search..."
+              formControlName="search"
+            />
           </div>
         </form>
       </div>
@@ -22,22 +30,29 @@
         style="cursor: pointer"
         (click)="selectInvoice(invoice)"
       >
-        {{ invoice.customer_name }}_{{ invoice.customer_contact }}_{{ invoice.invoice_date }}
+        {{ invoice.customer_name }}_{{ invoice.customer_contact }}_{{
+          invoice.invoice_date
+        }}
       </li>
 
       <!-- No Results Found -->
-      <li *ngIf="paginatedInvoices.length === 0" class="p-2 bg-light text-center">
+      <li
+        *ngIf="paginatedInvoices.length === 0"
+        class="p-2 bg-light text-center"
+      >
         No Results Found
       </li>
 
       <!-- Show More Button -->
       <li *ngIf="showMoreVisible" class="text-center mt-2">
-        <button class="btn btn-primary btn-sm" (click)="loadMore()">Show More</button>
+        <button class="btn btn-primary btn-sm" (click)="loadMore()">
+          Show More
+        </button>
       </li>
     </ul>
   </div>
   <!-- Main Content -->
-  <div class="flex-fill p-4" #main_section>
+  <div class="flex-fill p-4" #main_section *ngIf="paginatedInvoices.length > 0">
     <div class="bg-white p-5 shadow-lg position-relative main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -48,16 +63,16 @@
         </div>
         <div class="text-right">
           <h2 class="h4 font-weight-bold">INVOICE</h2>
-          <p>Invoice #: {{ invoiceDetails.invoice_id || 'N/A' }}</p>
-          <p>Date: {{ invoiceDetails.invoice_date || 'N/A' }}</p>
+          <p>Invoice #: {{ invoiceDetails.invoice_id || "N/A" }}</p>
+          <p>Date: {{ invoiceDetails.invoice_date || "N/A" }}</p>
         </div>
       </div>
 
       <!-- Client Details -->
       <div class="mb-4">
         <h3 class="font-weight-bold">BILL TO:</h3>
-        <p>{{ client.name || 'N/A' }}</p>
-        <p>Phone: {{ client.phone || 'N/A' }}</p>
+        <p>{{ client.name || "N/A" }}</p>
+        <p>Phone: {{ client.phone || "N/A" }}</p>
       </div>
 
       <!-- Invoice Table -->
@@ -78,7 +93,7 @@
             <td class="text-right">${{ item.total_price.toFixed(2) }}</td>
           </tr>
         </tbody>
-        <br>
+        <br />
         <tfoot>
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Subtotal</td>
@@ -86,15 +101,21 @@
           </tr>
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Discount</td>
-            <td class="text-right font-weight-bold">- ${{ invoiceDetails.discount || 0 }}</td>
+            <td class="text-right font-weight-bold">
+              - ${{ invoiceDetails.discount || 0 }}
+            </td>
           </tr>
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Tax</td>
-            <td class="text-right font-weight-bold">+ ${{ invoiceDetails.tax || 0 }}</td>
+            <td class="text-right font-weight-bold">
+              + ${{ invoiceDetails.tax || 0 }}
+            </td>
           </tr>
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Grand Total</td>
-            <td class="text-right font-weight-bold">${{ invoiceDetails.grand_total || 0 }}</td>
+            <td class="text-right font-weight-bold">
+              ${{ invoiceDetails.grand_total || 0 }}
+            </td>
           </tr>
         </tfoot>
       </table>

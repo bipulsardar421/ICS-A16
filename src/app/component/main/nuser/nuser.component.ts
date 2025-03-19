@@ -1,20 +1,18 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ModalService, ModalType } from '../../data/services/modal.service';
-import { AddEditVendorComponent } from '../../common/pop-up-component/add-edit-users/add-edit-vendor.component';
 import { UserService } from '../../data/services/user-details/user.service';
-import { UsersInterface } from '../../data/interfaces/users.interface';
+import { CommonModule } from '@angular/common';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { UsersInterface } from '../../data/interfaces/users.interface';
 
 @Component({
-  selector: 'app-vendor',
-  standalone: true,
+  selector: 'app-nuser',
   imports: [CommonModule, NgbPopoverModule],
-  templateUrl: './vendor.component.html',
-  styleUrls: ['./vendor.component.css'],
+  templateUrl: './nuser.component.html',
+  styleUrl: './nuser.component.css'
 })
-export class VendorComponent implements OnInit {
-  private modalService = inject(ModalService);
+export class NuserComponent {
+ private modalService = inject(ModalService);
   constructor(private userService: UserService) {}
   ngOnInit(): void {
     this.getUserDetails();
@@ -33,7 +31,7 @@ export class VendorComponent implements OnInit {
     this.openModel();
   }
   getUserDetails() {
-    this.userService.getDetails().subscribe({
+    this.userService.getClientDetails().subscribe({
       next: (response) => {
         this.vendors = response;
         if (response.status !== 'error') {

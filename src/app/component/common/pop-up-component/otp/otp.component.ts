@@ -131,4 +131,10 @@ export class OtpComponent implements OnInit, OnDestroy {
       });
     }
   }
+  closeModal() {
+    if (this.ngbModalService.hasOpenModals()) {
+      this.otpForm.reset();
+      this.ngbModalService.dismissAll();
+    }
+  }
 }

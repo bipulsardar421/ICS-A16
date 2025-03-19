@@ -30,6 +30,17 @@ export class UserService {
       }
     );
   }
+  getClientDetails(): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http.post(
+      `${this.userdetails}/clients`,
+      {},
+      {
+        headers,
+        withCredentials: true,
+      }
+    );
+  }
   getDetailsWithId(id: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
     return this.http.post(this.userDetailsWithId, id, {

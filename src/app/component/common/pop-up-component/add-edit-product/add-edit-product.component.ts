@@ -43,7 +43,7 @@ export class AddEditProductComponent implements OnInit {
   private stockService = inject(StockService);
   private alertService = inject(AlertService);
   private userService = inject(UserService);
-
+  invalidImageFormat = false;
   userRole$ = this.authService.userRole$;
   productForm!: FormGroup;
   selectedFile: File | null = null;
@@ -108,11 +108,19 @@ export class AddEditProductComponent implements OnInit {
       .subscribe((vendors) => (this.vendorsList = vendors));
   }
 
-  onFileChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-      this.productForm.patchValue({ image: this.selectedFile });
+  onFileChange(event: any) {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png'];
+
+      if (!allowedTypes.includes(file.type)) {
+        this.invalidImageFormat = true;
+        this.productForm.get('image')?.setErrors({ invalidFormat: true });
+      } else {
+        this.invalidImageFormat = false;
+        this.selectedFile = file;
+        this.productForm.patchValue({ image: this.selectedFile });
+      }
     }
   }
 
@@ -140,10 +148,8 @@ export class AddEditProductComponent implements OnInit {
       if (response) {
         this.alertService.hideLoading();
         this.alertService.showAlert('success', response.message);
+        this.stockService.notifyStockUpdate();
         this.closeModal();
-        this.router.navigateByUrl('/main/home', { skipLocationChange: true }).then(() => {
-          this.router.navigate(['/main/home']);
-        });
       }
     });
   }

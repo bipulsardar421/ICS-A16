@@ -33,13 +33,22 @@
         <li class="nav-item">
           <a class="nav-link" [routerLink]="'home'">Home</a>
         </li>
+        <li class="nav-item" *ngIf="role === 'admin'">
+          <a class="nav-link" [routerLink]="'nuser'">Users Management</a>
+        </li>
+        <li class="nav-item" *ngIf="role === 'admin'">
+          <a class="nav-link" type="button" [routerLink]="'client'">Clients</a>
+        </li>
+        <li class="nav-item" *ngIf="role === 'admin'">
+          <a class="nav-link" type="button" [routerLink]="'vendor'">Vendors</a>
+        </li>
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="'invoice'">Invoice</a>
+          <a class="nav-link" type="button" [routerLink]="'invoice'">Invoice</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" [routerLink]="'report'">Report</a>
         </li>
-        <li class="nav-item" *ngIf="role === 'admin' || role === 'vendor'">
+        <li class="nav-item" *ngIf="role === 'admin'">
           <a class="nav-link" [routerLink]="'bill'">Bills</a>
         </li>
       </ul>

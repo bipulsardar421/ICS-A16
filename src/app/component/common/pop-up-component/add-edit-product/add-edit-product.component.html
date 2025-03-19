@@ -96,12 +96,12 @@
         <div class="mb-3" *ngIf="userRole === 'vendor'">
           <label for="vendor" class="form-label">Vendor:</label>
           <input
-          type="text"
-          id="vendors"
-          class="form-control"
-          formControlName="vendors"
-          readonly
-        />
+            type="text"
+            id="vendors"
+            class="form-control"
+            formControlName="vendors"
+            readonly
+          />
         </div>
       </div>
       <div class="mb-3">
@@ -123,14 +123,17 @@
         </div>
       </div>
 
-      <div class="mb-3" *ngIf="image">
-        <label for="image" class="form-label">Image:</label>
+      <div class="form-group mb-3">
+        <label for="image">Upload Image</label>
         <input
           type="file"
           id="image"
           class="form-control"
           (change)="onFileChange($event)"
         />
+        <div *ngIf="invalidImageFormat" class="text-danger">
+          Only JPG and PNG images are allowed.
+        </div>
       </div>
 
       <button

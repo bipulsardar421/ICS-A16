@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ApiService } from '../api/api.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({
@@ -14,25 +14,27 @@ export class StockService {
 
   private userdetails: string = `${this.apiService.getBaseUrl()}/stock/view`;
   private stockAddUrl: string = `${this.apiService.getBaseUrl()}/stock/add`;
-  // private matchOtpUrl: string = `${this.apiService.getBaseUrl()}/login/match-otp`;
-  // private changePwdUrl: string = `${this.apiService.getBaseUrl()}/login/change-pwd`;
+
+  
+  private stockUpdated = new Subject<void>();
 
   getStock(): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    return this.http.post(
-      this.userdetails,
-      {},
-      {
-        headers,
-        withCredentials: true,
-      }
-    );
+    return this.http.post(this.userdetails, {}, { headers, withCredentials: true });
   }
+
   addStock(formData: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    return this.http.post(this.stockAddUrl, formData, {
-      headers,
-      withCredentials: true,
-    });
+    return this.http.post(this.stockAddUrl, formData, { headers, withCredentials: true });
+  }
+
+  
+  notifyStockUpdate() {
+    this.stockUpdated.next();
+  }
+
+  
+  getStockUpdateListener(): Observable<void> {
+    return this.stockUpdated.asObservable();
   }
 }
