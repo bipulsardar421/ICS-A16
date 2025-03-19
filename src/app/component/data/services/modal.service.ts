@@ -1,5 +1,6 @@
 import { Injectable, TemplateRef, EventEmitter, inject } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+
 export enum ModalType {
   LOGIN = 'LOGIN',
   SIGNUP = 'SIGNUP',
@@ -8,8 +9,11 @@ export enum ModalType {
   PRODUCT = 'PRODUCT',
   VENDOR = 'VENDOR',
   OTP = 'OTP',
-  USER='USER',
-  INVOICE='INVOICE'
+  USER = 'USER',
+  INVOICE = 'INVOICE',
+  REALCLIENT = 'REALCLIENT', // Ensure these are defined
+  REALVENDOR = 'REALVENDOR',
+  EDITUSER ='EDITUSER'
 }
 
 @Injectable({
@@ -17,9 +21,9 @@ export enum ModalType {
 })
 export class ModalService {
   private modalService = inject(NgbModal);
-  public openModalEvent: EventEmitter<ModalType> =
-    new EventEmitter<ModalType>();
+  public openModalEvent: EventEmitter<ModalType> = new EventEmitter<ModalType>();
   public dataTransferObject: EventEmitter<any> = new EventEmitter<any>();
+  private currentData: any = null; // Store data here
 
   open(content: TemplateRef<any>) {
     this.modalService
@@ -46,10 +50,21 @@ export class ModalService {
   }
 
   triggerOpenModal(modalType: ModalType) {
+    console.log('Triggering modal:', modalType, 'with data:', this.currentData);
     this.openModalEvent.emit(modalType);
   }
 
   public dataTransferer(dto: any) {
-    this.dataTransferObject.emit(dto);
+    console.log('Storing data:', dto);
+    this.currentData = dto; // Store data synchronously
+    this.dataTransferObject.emit(dto); // Still emit for other subscribers
+  }
+
+  public getCurrentData(): any {
+    return this.currentData; // Retrieve stored data
+  }
+
+  public clearCurrentData() {
+    this.currentData = null; // Clear after use
   }
 }

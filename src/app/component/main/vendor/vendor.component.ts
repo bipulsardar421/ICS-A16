@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ModalService, ModalType } from '../../data/services/modal.service';
-import { AddEditVendorComponent } from '../../common/pop-up-component/add-edit-users/add-edit-vendor.component';
 import { UserService } from '../../data/services/user-details/user.service';
-import { UsersInterface } from '../../data/interfaces/users.interface';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { ClientVendorService } from '../../data/services/client-vendor/client-vendor.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-vendor',
@@ -13,43 +13,79 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './vendor.component.html',
   styleUrls: ['./vendor.component.css'],
 })
-export class VendorComponent implements OnInit {
+export class VendorComponent implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
-  constructor(private userService: UserService) {}
-  ngOnInit(): void {
-    this.getUserDetails();
-  }
-  vendors: UsersInterface[] = [];
+  private _vendor = inject(ClientVendorService);
+  vendors: any[] = [];
+  private dataChangeSubscription!: Subscription;
 
-  addVendor() {
-    this.modalService.dataTransferer('Add');
-    this.openModel();
-  }
-  editVendor(data: UsersInterface) {
-    this.modalService.dataTransferer({
-      type: 'edit',
-      data,
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.fetchVendors();
+    this.dataChangeSubscription = this._vendor.dataChanged$.subscribe((entityType) => {
+      if (entityType === 'vendor') {
+        console.log('Vendor data changed, refreshing table');
+        this.fetchVendors();
+      }
     });
-    this.openModel();
   }
-  getUserDetails() {
-    this.userService.getDetails().subscribe({
-      next: (response) => {
-        this.vendors = response;
-        if (response.status !== 'error') {
+
+  ngOnDestroy(): void {
+    if (this.dataChangeSubscription) {
+      this.dataChangeSubscription.unsubscribe();
+    }
+  }
+
+  fetchVendors(): void {
+    this._vendor.getAllVendors().subscribe(
+      (response: { status: string; data: any[]; message: any }) => {
+        if (response.status === 'Success') {
+          this.vendors = response.data;
         } else {
+          console.error('Error fetching vendors:', response.message);
+          this.vendors = [];
         }
       },
-      error: (error) => {
-        console.error('Signup failed', error);
-      },
-    });
-  }
-  openModel() {
-    this.modalService.triggerOpenModal(ModalType.VENDOR);
+      (error: any) => {
+        console.error('HTTP error fetching vendors:', error);
+        this.vendors = [];
+      }
+    );
   }
 
-  deleteVendor(index: number) {
-    this.vendors.splice(index, 1);
+  addVendor() {
+    console.log('Adding new vendor');
+    this.modalService.dataTransferer({ type: 'Add' });
+    this.openModel();
+  }
+
+  openModel() {
+    this.modalService.triggerOpenModal(ModalType.REALVENDOR);
+  }
+
+  manageVendor(vendorId: number) {
+    console.log('Managing vendor with ID:', vendorId);
+    this.modalService.dataTransferer({ type: 'Edit', id: vendorId });
+    this.openModel();
+  }
+
+  deleteVendor(vendorId: number) {
+    const form = new FormData();
+    form.append('vendor_id', vendorId.toString());
+    this._vendor.deleteVendor(form).subscribe(
+      (response: { status: string; message: any }) => {
+        if (response.status === 'Success') {
+          this.vendors = this.vendors.filter((vendor) => vendor.vendor_id !== vendorId);
+          this._vendor.notifyDataChange('vendor'); 
+          console.log('Vendor deleted successfully');
+        } else {
+          console.error('Error deleting vendor:', response.message);
+        }
+      },
+      (error: any) => {
+        console.error('HTTP error deleting vendor:', error);
+      }
+    );
   }
 }

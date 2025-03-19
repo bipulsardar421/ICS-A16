@@ -1,43 +1,53 @@
 <section id="vendor" class="container shadow-sm">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h2 class="fw-semibold">Clients</h2>
-      <button
-        type="button"
-        (click)="addVendor()"
-        class="btn btn-dark rounded-circle px-3 py-2"
-        ngbPopover="Add Clients"
-        triggers="mouseenter:mouseleave"
-      >
-        +
-      </button>
-    </div>
-    <hr />
-    <div class="row">
-      <div
-        *ngFor="let vendor of vendors; let i = index"
-        class="col-12 col-sm-6 col-md-4 col-lg-2"
-      >
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
-            <img
-              [src]="vendor.image"
-              alt="Vendor Image"
-              class="img-fluid rounded-circle mb-2"
-              style="width: 80px; height: 80px"
-            />
-            <h5 class="card-title">{{ vendor.user_name }}</h5>
-            <p class="text-muted">{{ vendor.phone }}</p>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-primary btn-sm" (click)="editVendor(vendor)">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="fw-semibold">Clients</h2>
+    <button
+      type="button"
+      (click)="addClient()"
+      class="btn btn-dark rounded-circle px-3 py-2"
+      ngbPopover="Add Clients"
+      triggers="mouseenter:mouseleave"
+    >
+      +
+    </button>
+  </div>
+  <hr />
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Contact Person</th>
+            <th scope="col">Address</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of clients">
+            <td>{{ client.client_id }}</td>
+            <td>{{ client.client_name }}</td>
+            <td>{{ client.contact_person }}</td>
+            <td>{{ client.address }}</td>
+            <td>{{ client.phone }}</td>
+            <td>{{ client.created_at | date }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" (click)="manageClient(client.client_id)">
                 Manage
               </button>
-              <button (click)="deleteVendor(i)" class="btn btn-danger btn-sm">
+              <button class="btn btn-danger btn-sm" (click)="deleteClient(client.client_id)">
                 Delete
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
+            </td>
+          </tr>
+          <tr *ngIf="clients.length === 0">
+            <td colspan="7" class="text-center">No clients found</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </section>
-  
+  </div>
+</section>

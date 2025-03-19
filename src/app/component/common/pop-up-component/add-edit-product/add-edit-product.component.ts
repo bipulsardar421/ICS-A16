@@ -25,6 +25,8 @@ import { UserService } from '../../../data/services/user-details/user.service';
 import { AuthService } from '../../../data/services/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
+import { VendorsInterface } from '../../../data/interfaces/vendor.interface';
+import { ClientVendorService } from '../../../data/services/client-vendor/client-vendor.service';
 
 @Component({
   selector: 'app-add-edit-product',
@@ -42,7 +44,6 @@ export class AddEditProductComponent implements OnInit {
   private fb = inject(FormBuilder);
   private stockService = inject(StockService);
   private alertService = inject(AlertService);
-  private userService = inject(UserService);
   invalidImageFormat = false;
   userRole$ = this.authService.userRole$;
   productForm!: FormGroup;
@@ -50,35 +51,43 @@ export class AddEditProductComponent implements OnInit {
   what = 'Add';
   image = true;
   product: any;
-  vendorsList: { id: number; name: string }[] = [];
+  vendorsList: { id: string; name: string }[] = [];
 
   @ViewChild('add_product') add_productModalContent!: TemplateRef<any>;
 
-  constructor() {
+  constructor(private _vendor: ClientVendorService) {
     this.buildForm();
   }
 
   ngOnInit(): void {
-    this.userRole$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((role) => {
-      if (role === 'vendor') {
-        this.productForm.patchValue({ vendors: localStorage.getItem('user_id') });
-      }
-    });
-
-    this.modalService.openModalEvent.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((modalType) => {
-      if (modalType === ModalType.PRODUCT) {
-        this.openModal();
-      }
-    });
-
-    this.modalService.dataTransferObject.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
-      if (data) {
-        this.what = data.type;
-        if (data.type === 'Edit') {
-          this.ifEditSetForm(data.product);
+    this.userRole$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((role) => {
+        if (role === 'vendor') {
+          this.productForm.patchValue({
+            vendors: localStorage.getItem('user_id'),
+          });
         }
-      }
-    });
+      });
+
+    this.modalService.openModalEvent
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((modalType) => {
+        if (modalType === ModalType.PRODUCT) {
+          this.openModal();
+        }
+      });
+
+    this.modalService.dataTransferObject
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        if (data) {
+          this.what = data.type;
+          if (data.type === 'Edit') {
+            this.ifEditSetForm(data.product);
+          }
+        }
+      });
 
     this.loadVendors();
   }
@@ -95,17 +104,22 @@ export class AddEditProductComponent implements OnInit {
   }
 
   private loadVendors() {
-    this.userService
-      .getDetails()
-      .pipe(
-        map((res) => res.map((data: any) => ({ id: data.user_id, name: data.user_name }))),
-        catchError((err) => {
-          console.error('Error fetching vendors:', err);
-          return of([]);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((vendors) => (this.vendorsList = vendors));
+    this._vendor.getAllVendors().subscribe({
+      next: (response) => {
+        console.log('Raw response from API:', response);
+        // Access the 'data' array and map it
+        this.vendorsList = response.data.map((vendor: any) => ({
+          id: vendor.vendor_id.toString(), // Convert to string if needed
+          name: vendor.vendor_name,
+        }));
+        console.log('Populated vendorsList:', this.vendorsList);
+      },
+      error: (err) => {
+        console.error('Error fetching vendors:', err);
+        this.vendorsList = [];
+      },
+      complete: () => console.log('Vendor fetch completed'),
+    });
   }
 
   onFileChange(event: any) {
@@ -137,26 +151,31 @@ export class AddEditProductComponent implements OnInit {
     const formData = FormDataConverter.toFormData(this.productForm);
     this.alertService.showLoading();
 
-    this.stockService.addStock(formData).pipe(
-      catchError((err) => {
-        this.alertService.hideLoading();
-        this.alertService.showAlert('danger', err.message);
-        return of(null);
-      }),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe((response) => {
-      if (response) {
-        this.alertService.hideLoading();
-        this.alertService.showAlert('success', response.message);
-        this.stockService.notifyStockUpdate();
-        this.closeModal();
-      }
-    });
+    this.stockService
+      .addStock(formData)
+      .pipe(
+        catchError((err) => {
+          this.alertService.hideLoading();
+          this.alertService.showAlert('danger', err.message);
+          return of(null);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.alertService.hideLoading();
+          this.alertService.showAlert('success', response.message);
+          this.stockService.notifyStockUpdate();
+          this.closeModal();
+        }
+      });
   }
 
   openModal() {
     if (this.add_productModalContent) {
-      this.ngbModalService.open(this.add_productModalContent, { ariaLabelledBy: 'modal-basic-title' });
+      this.ngbModalService.open(this.add_productModalContent, {
+        ariaLabelledBy: 'modal-basic-title',
+      });
     }
   }
 

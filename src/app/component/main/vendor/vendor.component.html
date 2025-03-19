@@ -13,30 +13,41 @@
   </div>
   <hr />
   <div class="row">
-    <div
-      *ngFor="let vendor of vendors; let i = index"
-      class="col-12 col-sm-6 col-md-4 col-lg-2"
-    >
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <img
-            [src]="vendor.image"
-            alt="Vendor Image"
-            class="img-fluid rounded-circle mb-2"
-            style="width: 80px; height: 80px"
-          />
-          <h5 class="card-title">{{ vendor.user_name }}</h5>
-          <p class="text-muted">{{ vendor.phone }}</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-primary btn-sm" (click)="editVendor(vendor)">
-              Manage
-            </button>
-            <button (click)="deleteVendor(i)" class="btn btn-danger btn-sm">
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="col-12">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Contact Person</th>
+            <th scope="col">Address</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vendor of vendors">
+            <td>{{ vendor.vendor_id }}</td>
+            <td>{{ vendor.vendor_name }}</td>
+            <td>{{ vendor.contact_person }}</td>
+            <td>{{ vendor.address }}</td>
+            <td>{{ vendor.phone }}</td>
+            <td>{{ vendor.created_at | date }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2" (click)="manageVendor(vendor.vendor_id)">
+                Manage
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteVendor(vendor.vendor_id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="vendors.length === 0">
+            <td colspan="7" class="text-center">No vendors found</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>

@@ -1,53 +1,82 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ModalService, ModalType } from '../../data/services/modal.service';
 import { UserService } from '../../data/services/user-details/user.service';
 import { CommonModule } from '@angular/common';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { UsersInterface } from '../../data/interfaces/users.interface';
+import { Subscription } from 'rxjs';
+import { EditUserDetailsComponent } from '../../common/pop-up-component/edit-user-details/edit-user-details.component';
 
 @Component({
   selector: 'app-nuser',
-  imports: [CommonModule, NgbPopoverModule],
+  standalone: true,
+  imports: [CommonModule, NgbPopoverModule, EditUserDetailsComponent],
   templateUrl: './nuser.component.html',
-  styleUrl: './nuser.component.css'
+  styleUrls: ['./nuser.component.css'],
 })
-export class NuserComponent {
- private modalService = inject(ModalService);
-  constructor(private userService: UserService) {}
+export class NuserComponent implements OnInit, OnDestroy {
+  private modalService = inject(ModalService);
+  private userService = inject(UserService);
+  users: UsersInterface[] = [];
+  private userUpdateSubscription!: Subscription;
+
   ngOnInit(): void {
     this.getUserDetails();
+    this.userUpdateSubscription = this.userService.userUpdated$.subscribe(
+      (updatedUser: UsersInterface) => {
+        const index = this.users.findIndex(
+          (user) => user.user_id === updatedUser.user_id
+        );
+        if (index !== -1) {
+          this.users[index] = { ...updatedUser }; // Update existing user
+        }
+        console.log('User updated in DOM:', updatedUser);
+      }
+    );
   }
-  vendors: UsersInterface[] = [];
 
-  addVendor() {
+  ngOnDestroy(): void {
+    if (this.userUpdateSubscription) {
+      this.userUpdateSubscription.unsubscribe();
+    }
+  }
+
+  addUser() {
     this.modalService.dataTransferer('Add');
-    this.openModel();
+    this.openModal();
   }
-  editVendor(data: UsersInterface) {
-    this.modalService.dataTransferer({
-      type: 'edit',
-      data,
-    });
-    this.openModel();
+
+  editUser(data: UsersInterface) {
+    this.modalService.dataTransferer({ type: 'edit', data });
+    this.modalService.triggerOpenModal(ModalType.EDITUSER);
   }
+
   getUserDetails() {
-    this.userService.getClientDetails().subscribe({
+    this.userService.getDetails().subscribe({
       next: (response) => {
-        this.vendors = response;
-        if (response.status !== 'error') {
-        } else {
+        this.users = response; // Assuming response is an array of UsersInterface
+        console.log('Users fetched:', this.users);
+      },
+      error: (error) => console.error('Error fetching users:', error),
+    });
+  }
+
+  openModal() {
+    this.modalService.triggerOpenModal(ModalType.VENDOR); // Use EDITUSER
+  }
+
+  deleteUser(index: number) {
+    const userId = this.users[index].user_id; // Use user_id
+    const formData = new FormData();
+    formData.append('id', userId.toString());
+    this.userService.deleteDetails(formData).subscribe({
+      next: (response) => {
+        if (response.status === 'success') {
+          this.users.splice(index, 1);
+          console.log('User deleted');
         }
       },
-      error: (error) => {
-        console.error('Signup failed', error);
-      },
+      error: (error) => console.error('Error deleting user:', error),
     });
-  }
-  openModel() {
-    this.modalService.triggerOpenModal(ModalType.VENDOR);
-  }
-
-  deleteVendor(index: number) {
-    this.vendors.splice(index, 1);
   }
 }

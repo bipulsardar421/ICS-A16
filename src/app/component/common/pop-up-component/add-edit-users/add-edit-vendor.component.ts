@@ -110,12 +110,13 @@ export class AddEditVendorComponent implements OnDestroy {
       this._signUp.registerUser(form).subscribe({
         next: (res) => {
           this._alert.hideLoading();
-          if (res.status === "success") {
-            this._alert.showAlert("success", res.message);
+          if (res.status === 'success') {
+            this._alert.showAlert('success', res.message);
             this.userForm.reset();
             this.ngbModalService.dismissAll();
-          }else{
-            this._alert.showAlert("danger", res.message);
+            window.location.reload();
+          } else {
+            this._alert.showAlert('danger', res.message);
           }
         },
       });

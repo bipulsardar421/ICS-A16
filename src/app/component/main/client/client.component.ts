@@ -1,53 +1,92 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ModalService, ModalType } from '../../data/services/modal.service';
 import { UserService } from '../../data/services/user-details/user.service';
 import { CommonModule } from '@angular/common';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { UsersInterface } from '../../data/interfaces/users.interface';
+import { ClientVendorService } from '../../data/services/client-vendor/client-vendor.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-client',
+  standalone: true,
   imports: [CommonModule, NgbPopoverModule],
   templateUrl: './client.component.html',
-  styleUrl: './client.component.css',
+  styleUrls: ['./client.component.css'],
 })
-export class ClientComponent implements OnInit {
+export class ClientComponent implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
-  constructor(private userService: UserService) {}
-  ngOnInit(): void {
-    this.getUserDetails();
-  }
-  vendors: UsersInterface[] = [];
+  private _client = inject(ClientVendorService);
+  clients: any[] = [];
+  private dataChangeSubscription!: Subscription;
 
-  addVendor() {
-    this.modalService.dataTransferer('Add');
-    this.openModel();
-  }
-  editVendor(data: UsersInterface) {
-    this.modalService.dataTransferer({
-      type: 'edit',
-      data,
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.fetchClients();
+    this.dataChangeSubscription = this._client.dataChanged$.subscribe((entityType) => {
+      if (entityType === 'client') {
+        console.log('Client data changed, refreshing table');
+        this.fetchClients();
+      }
     });
-    this.openModel();
   }
-  getUserDetails() {
-    this.userService.getClientDetails().subscribe({
-      next: (response) => {
-        this.vendors = response;
-        if (response.status !== 'error') {
+
+  ngOnDestroy(): void {
+    if (this.dataChangeSubscription) {
+      this.dataChangeSubscription.unsubscribe();
+    }
+  }
+
+  fetchClients(): void {
+    this._client.getAllClients().subscribe(
+      (response) => {
+        if (response.status === 'Success') {
+          this.clients = response.data;
         } else {
+          console.error('Error fetching clients:', response.message);
+          this.clients = [];
         }
       },
-      error: (error) => {
-        console.error('Signup failed', error);
-      },
-    });
-  }
-  openModel() {
-    this.modalService.triggerOpenModal(ModalType.USER);
+      (error) => {
+        console.error('HTTP error fetching clients:', error);
+        this.clients = [];
+      }
+    );
   }
 
-  deleteVendor(index: number) {
-    this.vendors.splice(index, 1);
+  openModel() {
+    this.modalService.triggerOpenModal(ModalType.REALCLIENT);
+  }
+
+  manageClient(clientId: number) {
+    console.log('Managing client with ID:', clientId);
+    this.modalService.dataTransferer({ type: 'Edit', id: clientId });
+    this.openModel();
+  }
+
+  addClient() {
+    console.log('Adding new client');
+    this.modalService.dataTransferer({ type: 'Add' });
+    this.openModel();
+  }
+
+  deleteClient(clientId: number) {
+    console.log(`Deleting client with ID: ${clientId}`);
+    const form = new FormData();
+    form.append('client_id', clientId.toString());
+    this._client.deleteClient(form).subscribe(
+      (response) => {
+        if (response.status === 'Success') {
+          this.clients = this.clients.filter((client) => client.client_id !== clientId);
+          this._client.notifyDataChange('client'); 
+          console.log('Client deleted successfully');
+        } else {
+          console.error('Error deleting client:', response.message);
+        }
+      },
+      (error) => {
+        console.error('HTTP error deleting client:', error);
+      }
+    );
   }
 }

@@ -80,45 +80,45 @@
         <thead>
           <tr>
             <th class="text-left">PRODUCT NAME</th>
-            <th>QUANTITY</th>
-            <th>UNIT PRICE</th>
-            <th class="text-right">TOTAL</th>
+            <th class="text-center">QUANTITY</th>
+            <th class="text-center">UNIT PRICE ($)</th>
+            <th class="text-center">TOTAL ($)</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of invoiceDetails.items">
             <td>{{ item.product_name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.unit_price }}</td>
-            <td class="text-right">${{ item.total_price.toFixed(2) }}</td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-center">${{ item.unit_price.toFixed(2) }}</td>
+            <td class="text-center">${{ item.total_price.toFixed(2) }}</td>
           </tr>
         </tbody>
-        <br />
         <tfoot>
           <tr>
-            <td colspan="3" class="text-right font-weight-bold">Subtotal</td>
-            <td class="text-right font-weight-bold">${{ getTotal() }}</td>
+            <td colspan="3" class="text-right font-weight-bold">Subtotal:</td>
+            <td class="text-center font-weight-bold">${{ getTotal().toFixed(2) }}</td>
           </tr>
           <tr>
-            <td colspan="3" class="text-right font-weight-bold">Discount</td>
-            <td class="text-right font-weight-bold">
-              - ${{ invoiceDetails.discount || 0 }}
+            <td colspan="3" class="text-right font-weight-bold">Discount:</td>
+            <td class="text-center font-weight-bold text-danger">
+              - ${{ (invoiceDetails.discount || 0).toFixed(2) }}
             </td>
           </tr>
           <tr>
-            <td colspan="3" class="text-right font-weight-bold">Tax</td>
-            <td class="text-right font-weight-bold">
-              + ${{ invoiceDetails.tax || 0 }}
+            <td colspan="3" class="text-right font-weight-bold">Tax:</td>
+            <td class="text-center font-weight-bold text-success">
+              + ${{ (invoiceDetails.tax || 0).toFixed(2) }}
             </td>
           </tr>
-          <tr>
-            <td colspan="3" class="text-right font-weight-bold">Grand Total</td>
-            <td class="text-right font-weight-bold">
-              ${{ invoiceDetails.grand_total || 0 }}
+          <tr class="table-dark">
+            <td colspan="3" class="text-right font-weight-bold">Grand Total:</td>
+            <td class="text-center font-weight-bold">
+              ${{ (invoiceDetails.grand_total || 0).toFixed(2) }}
             </td>
           </tr>
         </tfoot>
       </table>
+      
 
       <p class="text-center font-weight-bold">Thank you for your business!</p>
       <p class="text-center text-muted mt-4">

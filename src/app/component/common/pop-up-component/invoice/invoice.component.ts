@@ -22,6 +22,7 @@ import { InvoiceService } from '../../../data/services/invoice/invoice.service';
 import { AlertService } from '../../../data/services/alert.service';
 import { Router } from '@angular/router';
 import { takeUntil, Subject } from 'rxjs';
+import { ClientVendorService } from '../../../data/services/client-vendor/client-vendor.service';
 
 @Component({
   selector: 'app-invoice',
@@ -40,6 +41,7 @@ export class InvoiceComponent implements OnInit {
   private cartService = inject(CartService);
   private invoiceService = inject(InvoiceService);
   private alertService = inject(AlertService);
+  private client = inject(ClientVendorService);
 
   userRole$ = this.authService.userRole$;
   userDetails = this.getUserDetails();
@@ -47,7 +49,7 @@ export class InvoiceComponent implements OnInit {
   invoiceForm!: FormGroup;
   paymentStatusOptions = ['Pending', 'Paid', 'Cancelled'];
   paymentMethods = ['Cash', 'Card', 'Bank'];
-
+  clients: { id: number; name: string; phone: string }[] = [];
   products: CartItem[] = [];
   customerType = 'self';
 
@@ -57,25 +59,51 @@ export class InvoiceComponent implements OnInit {
     this.initializeForm();
     this.setupGrandTotalCalculation();
     this.subscribeToModalEvents();
+    this.fillClientArray();
   }
 
   private getUserDetails() {
     const userDetails = localStorage.getItem('user_details');
     return userDetails ? JSON.parse(userDetails) : null;
   }
+  fillClientArray() {
+    this.client.getAllClients().subscribe({
+      next: (response: any) => {
+        if (response?.data && Array.isArray(response.data)) {
+          this.clients = response.data.map((client: any) => ({
+            id: client.client_id,
+            name: client.client_name,
+            phone: client.phone,
+          }));
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching clients:', err);
+      },
+    });
+  }
+  onCustomerChange(event: Event): void {
+    const selectedClientId = (event.target as HTMLSelectElement).value;
+    const selectedClient = this.clients.find(
+      (client) => client.id === +selectedClientId
+    );
+
+    if (selectedClient) {
+      this.invoiceForm.patchValue({
+        customer_id_display: selectedClient.id, // Display the ID
+        customer_name: selectedClient.name, // Store name
+        customer_contact: selectedClient.phone, // Store phone number
+      });
+    }
+  }
 
   private initializeForm(): void {
     const currentDate = new Date().toISOString().slice(0, 10);
 
     this.invoiceForm = this.fb.group({
-      customer_name: [
-        { value: this.userDetails?.user_name || '', disabled: true },
-        Validators.required,
-      ],
-      customer_contact: [
-        { value: this.userDetails?.phone || '', disabled: true },
-        Validators.required,
-      ],
+      customer_id: ['', Validators.required], // Holds the selected client_id
+      customer_name: [{ value: '', disabled: true }, Validators.required], // Holds client_name
+      customer_contact: [{ value: '', disabled: true }, Validators.required], // Holds phone number
       invoice_date: [
         { value: currentDate, disabled: true },
         Validators.required,
@@ -91,13 +119,14 @@ export class InvoiceComponent implements OnInit {
       payment_method: ['', Validators.required],
       notes: [''],
     });
+
     this.checkRole();
     this.calculateGrandTotal();
   }
 
   checkRole(): void {
     this.userRole$.subscribe((roles: any) => {
-      if (roles.includes('admin') || roles.includes('vendor')) {
+      if (roles.includes('admin') || roles.includes('nuser')) {
         this.invoiceForm.get('customer_name')?.enable();
         this.invoiceForm.get('customer_contact')?.enable();
         this.invoiceForm.get('customer_name')?.reset();

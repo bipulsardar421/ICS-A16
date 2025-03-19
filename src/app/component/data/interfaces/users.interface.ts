@@ -4,4 +4,5 @@ export interface UsersInterface {
   phone: number;
   address: string;
   user_id: number;
+  id: number;
 }

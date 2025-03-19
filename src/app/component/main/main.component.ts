@@ -14,6 +14,7 @@ import { AlertService } from '../data/services/alert.service';
 import { BehaviorSubject, map } from 'rxjs';
 import { AddEditProductComponent } from '../common/pop-up-component/add-edit-product/add-edit-product.component';
 import { AddEditVendorComponent } from "../common/pop-up-component/add-edit-users/add-edit-vendor.component";
+import { AddEditClientVendorComponent } from "../common/pop-up-component/add-edit-client-vendor/add-edit-client-vendor.component";
 
 @Component({
   selector: 'app-main',
@@ -22,7 +23,8 @@ import { AddEditVendorComponent } from "../common/pop-up-component/add-edit-user
     RouterOutlet,
     UserDetailsComponent,
     AddEditProductComponent,
-    AddEditVendorComponent
+    AddEditVendorComponent,
+    AddEditClientVendorComponent
 ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css',
