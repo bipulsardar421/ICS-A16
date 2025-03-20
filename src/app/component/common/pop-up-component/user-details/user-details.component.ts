@@ -34,6 +34,7 @@ export class UserDetailsComponent implements OnInit {
   userForm: FormGroup;
   usernameTaken = false;
   phoneTaken = false;
+  imagePreview: string | ArrayBuffer | null = null;
 
   selectedFile: File | null = null;
   @ViewChild('user_details') user_detailsModalContent!: TemplateRef<any>;
@@ -45,7 +46,7 @@ export class UserDetailsComponent implements OnInit {
   ) {
     this.userForm = this.fb.group({
       user_id: [{ value: localStorage.getItem('user_id'), disabled: true }],
-      user_name: ['', [Validators.required, Validators.maxLength(100)]],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       address: ['', [Validators.required]],
       image: [null, Validators.required],
@@ -77,6 +78,12 @@ export class UserDetailsComponent implements OnInit {
         this.selectedFile = file;
         this.userForm.patchValue({ image: this.selectedFile });
       }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
+      this.userForm.patchValue({ image: file });
     }
   }
 

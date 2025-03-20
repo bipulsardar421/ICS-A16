@@ -6,56 +6,92 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FormDataConverter } from '../../data/helper/formdata.helper';
 import { ReportService } from '../../data/services/report/report.service';
+import { ReportData } from '../../data/interfaces/report.interface';
 
 @Component({
   selector: 'app-report',
   standalone: true,
   imports: [CommonModule, DatePipe, ReactiveFormsModule],
   templateUrl: './report.component.html',
-  styleUrl: './report.component.css',
+  styleUrls: ['./report.component.css'],
 })
 export class ReportComponent implements OnInit {
-  reportForm!: FormGroup;
-  selectedDate!: string;
-  reportData: any[] = [];
-  maxCustomerData: any[] = [];
-  maxInvoiceData: any[] = [];
-  maxDate: string = new Date().toISOString().split('T')[0];
+  reportForm: FormGroup;
+  reportData: ReportData | null = null;
+  maxDate: string = new Date().toISOString().split('T')[0]; // Today’s date as max
 
-  constructor(private fb: FormBuilder, private reportService: ReportService) {}
+  // Column definitions for tables
+  stockColumns = [
+    'product_id',
+    'product_name',
+    'stock_on_hand',
+    'rate',
+    'recieved_date',
+    'supplier',
+  ];
+  vendorColumns = [
+    'vendor_id',
+    'vendor_name',
+    'contact_person',
+    'phone',
+    'product_name',
+    'supplied_quantity',
+    'rate',
+    'recieved_date',
+  ];
+  invoiceDateColumns = [
+    'invoice_date',
+    'invoice_count',
+    'total_amount',
+    'payment_status',
+    'invoice_ids',
+  ];
+  invoiceClientColumns = [
+    'client_id',
+    'client_name',
+    'invoice_count',
+    'total_amount',
+    'payment_status',
+    'invoice_ids',
+  ];
+  invoiceProductColumns = [
+    'product_id',
+    'product_name',
+    'total_quantity_sold',
+    'total_amount',
+    'invoice_count',
+  ];
 
-  ngOnInit(): void {
-    this.initializeForm();
-  }
-
-  initializeForm(): void {
+  constructor(private fb: FormBuilder, private reportService: ReportService) {
     this.reportForm = this.fb.group({
       start: ['', Validators.required],
       end: ['', Validators.required],
     });
   }
 
-  generateReport(): void {
-    if (this.reportForm.valid) {
-      const formdata = FormDataConverter.toFormData(this.reportForm);
-      
-      this.reportService.getReport(formdata).subscribe({
-        next: (res) => {
-          this.reportData = res.reportData || [];
-          this.maxCustomerData = res.maxCustomerData || [];
-          this.maxInvoiceData = res.maxInvoiceData || [];
-          this.selectedDate = this.reportForm.value.startDate;
-        },
-        error: (err) => {
-          console.error('Error fetching report:', err);
-        },
-      });
-    }
-  }
+  ngOnInit(): void {}
 
-  getTotal(): number {
-    return this.reportData.reduce((total, item) => total + (item.total_quantity || 0), 0);
+  generateReport(): void {
+    if (this.reportForm.invalid) return;
+
+    // Prepare FormData manually since FormDataConverter.toFormData might not be available
+    const formData = new FormData();
+    formData.append('startDate', this.reportForm.get('start')?.value);
+    formData.append('endDate', this.reportForm.get('end')?.value);
+
+    this.reportService.getReport(formData).subscribe(
+      (response) => {
+        if (response.status === 'success') {
+          this.reportData = response.data;
+        }
+      },
+      (error) => {
+        console.error('Error fetching report data:', error);
+      }
+    );
+  }
+  printReport() {
+    window.print();
   }
 }

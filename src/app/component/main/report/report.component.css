@@ -3,3 +3,26 @@ aside input:focus, section input:focus {
     border-color: #4CAF50;
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
+
+.main-content {
+    height: calc(100vh - 32px);
+    overflow: auto;
+  }
+  
+  .sidebar {
+    height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+  
+  ul.list-unstyled {
+    background-color: #ffffff; 
+    padding: 10px;
+    border-radius: 5px;
+  }
+  ul.list-unstyled li {
+    transition: background-color 0.3s ease-in-out;
+  }
+  ul.list-unstyled li:hover {
+    background-color: #007bff; 
+    color: rgb(209, 112, 254);
+  }

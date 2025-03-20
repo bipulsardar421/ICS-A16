@@ -101,13 +101,13 @@
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Discount:</td>
             <td class="text-center font-weight-bold text-danger">
-              - ${{ (invoiceDetails.discount || 0).toFixed(2) }}
+              {{ (invoiceDetails.discount || 0).toFixed(2) }} %
             </td>
           </tr>
           <tr>
             <td colspan="3" class="text-right font-weight-bold">Tax:</td>
             <td class="text-center font-weight-bold text-success">
-              + ${{ (invoiceDetails.tax || 0).toFixed(2) }}
+              {{ (invoiceDetails.tax || 0).toFixed(2) }} %
             </td>
           </tr>
           <tr class="table-dark">

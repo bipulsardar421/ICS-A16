@@ -10,9 +10,15 @@ import { AuthService } from '../../data/services/auth/auth.service';
   templateUrl: './main-home.component.html',
   styleUrl: './main-home.component.css',
 })
-export class MainHomeComponent{
+export class MainHomeComponent {
   authService = inject(AuthService);
   userRole$ = this.authService.userRole$;
 
- 
+  ngOnInit(): void {
+    this.authService.getIsNewFun().subscribe({
+      next: (res: any) => {
+        alert(res);
+      },
+    });
+  }
 }

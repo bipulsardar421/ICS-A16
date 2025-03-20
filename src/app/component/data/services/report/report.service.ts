@@ -10,7 +10,7 @@ import { AuthService } from '../auth/auth.service';
 export class ReportService {
  private apiService = inject(ApiService);
   private http = inject(HttpClient);
-  private report: string = `${this.apiService.getBaseUrl()}/report`;
+  private report: string = `${this.apiService.getBaseUrl()}/report/generate`;
 
   getReport(formData: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });

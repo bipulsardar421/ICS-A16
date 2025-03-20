@@ -15,17 +15,13 @@ import {
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertService } from '../../../data/services/alert.service';
 import { ModalService, ModalType } from '../../../data/services/modal.service';
-import { SignUpService } from '../../../data/services/sign-up/sign-up.service';
 import { CommonModule } from '@angular/common';
 import { StockService } from '../../../data/services/stock/stock.service';
 import { FormDataConverter } from '../../../data/helper/formdata.helper';
-import { Router } from '@angular/router';
 import { StockInterface } from '../../../data/interfaces/stock.interface';
-import { UserService } from '../../../data/services/user-details/user.service';
 import { AuthService } from '../../../data/services/auth/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, map, of } from 'rxjs';
-import { VendorsInterface } from '../../../data/interfaces/vendor.interface';
+import { catchError, of } from 'rxjs';
 import { ClientVendorService } from '../../../data/services/client-vendor/client-vendor.service';
 
 @Component({
@@ -40,18 +36,19 @@ export class AddEditProductComponent implements OnInit {
   private authService = inject(AuthService);
   private modalService = inject(ModalService);
   private ngbModalService = inject(NgbModal);
-  private router = inject(Router);
   private fb = inject(FormBuilder);
   private stockService = inject(StockService);
   private alertService = inject(AlertService);
+
   invalidImageFormat = false;
   userRole$ = this.authService.userRole$;
   productForm!: FormGroup;
   selectedFile: File | null = null;
   what = 'Add';
-  image = true;
-  product: any;
   vendorsList: { id: string; name: string }[] = [];
+  currentProduct: StockInterface | null = null; // Store product being edited
+  isSubmitting = false; // Track submission state
+  private modalRef: any; // Store modal reference
 
   @ViewChild('add_product') add_productModalContent!: TemplateRef<any>;
 
@@ -83,8 +80,12 @@ export class AddEditProductComponent implements OnInit {
       .subscribe((data) => {
         if (data) {
           this.what = data.type;
-          if (data.type === 'Edit') {
+          if (data.type === 'Edit' && data.product) {
+            this.currentProduct = data.product;
             this.ifEditSetForm(data.product);
+          } else {
+            this.currentProduct = null;
+            this.resetForm();
           }
         }
       });
@@ -94,31 +95,38 @@ export class AddEditProductComponent implements OnInit {
 
   private buildForm() {
     this.productForm = this.fb.group({
+      product_id: [0], // Separate control for product ID
       product_name: ['', [Validators.required, Validators.maxLength(255)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       rate: [0, [Validators.required, Validators.min(1)]],
       vendors: ['', Validators.required],
       recieved_date: ['', Validators.required],
-      image: [null, Validators.required],
+      image: [null], // Image optional for edit
     });
+  }
+
+  private resetForm() {
+    this.productForm.reset({
+      product_id: 0,
+      quantity: 1,
+      rate: 0,
+    });
+    this.selectedFile = null;
+    this.invalidImageFormat = false;
   }
 
   private loadVendors() {
     this._vendor.getAllVendors().subscribe({
       next: (response) => {
-        console.log('Raw response from API:', response);
-        // Access the 'data' array and map it
         this.vendorsList = response.data.map((vendor: any) => ({
-          id: vendor.vendor_id.toString(), // Convert to string if needed
+          id: vendor.vendor_id.toString(),
           name: vendor.vendor_name,
         }));
-        console.log('Populated vendorsList:', this.vendorsList);
       },
       error: (err) => {
         console.error('Error fetching vendors:', err);
         this.vendorsList = [];
       },
-      complete: () => console.log('Vendor fetch completed'),
     });
   }
 
@@ -139,24 +147,53 @@ export class AddEditProductComponent implements OnInit {
   }
 
   ifEditSetForm(product: StockInterface) {
-    console.log(product);
+    console.log('Editing product:', product);
+    this.productForm.patchValue({
+      product_id: product.product_id,
+      product_name: product.product_name,
+      quantity: product.quantity,
+      rate: product.rate,
+      vendors: product.vendor_id.toString(),
+      recieved_date: product.recieved_date.split('T')[0], 
+      image: product.image,
+    });
+    this.selectedFile = null;
   }
 
   onSubmit() {
     if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
       alert('Please fill all required fields correctly.');
       return;
     }
 
+    this.isSubmitting = true;
     const formData = FormDataConverter.toFormData(this.productForm);
+
+    if (this.selectedFile) {
+      formData.set('image', this.selectedFile);
+    } else if (this.what === 'Edit' && this.currentProduct?.image) {
+      formData.set('image', this.currentProduct.image);
+    }
+
+    console.log('Form data:', Array.from(formData.entries())); // Debug FormData
+
     this.alertService.showLoading();
 
-    this.stockService
-      .addStock(formData)
+    const request =
+      this.what === 'Edit' && this.currentProduct
+        ? this.stockService.updateStock(this.currentProduct.product_id, formData)
+        : this.stockService.addStock(formData);
+
+    request
       .pipe(
         catchError((err) => {
           this.alertService.hideLoading();
-          this.alertService.showAlert('danger', err.message);
+          this.alertService.showAlert(
+            'danger',
+            err.message || 'Operation failed'
+          );
+          this.isSubmitting = false;
           return of(null);
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -164,24 +201,31 @@ export class AddEditProductComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.alertService.hideLoading();
-          this.alertService.showAlert('success', response.message);
+          this.alertService.showAlert(
+            'success',
+            response.message || `${this.what} successful`
+          );
           this.stockService.notifyStockUpdate();
           this.closeModal();
         }
+        this.isSubmitting = false;
       });
   }
 
   openModal() {
     if (this.add_productModalContent) {
-      this.ngbModalService.open(this.add_productModalContent, {
+      this.modalRef = this.ngbModalService.open(this.add_productModalContent, {
         ariaLabelledBy: 'modal-basic-title',
       });
     }
   }
 
   closeModal() {
-    if (this.add_productModalContent) {
-      this.ngbModalService.dismissAll();
+    if (this.modalRef) {
+      this.modalRef.close();
+      this.modalRef = null;
     }
+    this.resetForm();
+    this.modalService.clearCurrentData();
   }
 }

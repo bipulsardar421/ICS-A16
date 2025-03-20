@@ -14,6 +14,7 @@ export class StockService {
 
   private userdetails: string = `${this.apiService.getBaseUrl()}/stock/view`;
   private stockAddUrl: string = `${this.apiService.getBaseUrl()}/stock/add`;
+  private stockUpdateUrl: string = `${this.apiService.getBaseUrl()}/stock/update`;
 
   
   private stockUpdated = new Subject<void>();
@@ -28,7 +29,12 @@ export class StockService {
     return this.http.post(this.stockAddUrl, formData, { headers, withCredentials: true });
   }
 
-  
+  updateStock(productId: number, formData: FormData): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    formData.append('id', productId.toString()); 
+    return this.http.post(this.stockUpdateUrl, formData, { headers, withCredentials: true });
+  }
+
   notifyStockUpdate() {
     this.stockUpdated.next();
   }

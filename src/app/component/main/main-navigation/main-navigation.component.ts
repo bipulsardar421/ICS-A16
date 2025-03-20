@@ -11,29 +11,29 @@ import { AuthService } from '../../data/services/auth/auth.service';
   templateUrl: './main-navigation.component.html',
   styleUrl: './main-navigation.component.css',
 })
-export class MainNavigationComponent implements OnInit{
-private router = inject(Router)
+export class MainNavigationComponent implements OnInit {
+  private router = inject(Router);
   name: string = '';
   role: string = '';
   profile_image: string = '';
   constructor(private mcom: MainComponent, private auth: AuthService) {}
   ngOnInit(): void {
-    this.mcom.user$.subscribe(user => {
+    this.mcom.user$.subscribe((user) => {
       this.name = user.name;
       this.role = user.role;
       this.profile_image = user.profile_image;
     });
     console.log(this.name);
-    
   }
   isDropdownOpen: boolean = false;
+  
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
   onLogoutClick() {
     this.auth.logout();
-    localStorage.clear()
-    this.router.navigate(['/home'])
+    localStorage.clear();
+    this.router.navigate(['/home']);
   }
   onSettingsClick() {
     throw new Error('Method not implemented.');

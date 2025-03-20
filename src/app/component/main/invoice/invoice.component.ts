@@ -63,52 +63,25 @@ export class InvoiceComponent implements OnInit {
   }
 
   getUserInvoices() {
-    if (this.user_details?.phone) {
-      const uid = new FormData();
-      uid.append('phone', this.user_details.phone);
-      this.userRole$.subscribe((role) => {
-        if (role === 'admin') {
-          this.invoiceService.getAll().subscribe({
-            next: (response) => {
-              if (response.status !== 'error' && Array.isArray(response)) {
-                this.invoices = response;
-                this.filteredInvoices = [...this.invoices];
-                this.resetPagination();
-                if (this.filteredInvoices.length > 0) {
-                  this.selectInvoice(this.filteredInvoices[0]);
-                }
-              } else {
-                this.invoices = [];
-                this.filteredInvoices = [];
-              }
-            },
-            error: (error) => {
-              console.error('API Call Failed:', error);
-            },
-          });
-        } else {
-          this.invoiceService.getInvoiceDetails(uid).subscribe({
-            next: (response) => {
-              if (response.status !== 'error' && Array.isArray(response)) {
-                this.invoices = response;
-
-                this.filteredInvoices = [...this.invoices];
-                this.resetPagination();
-                if (this.filteredInvoices.length > 0) {
-                  this.selectInvoice(this.filteredInvoices[0]);
-                }
-              } else {
-                this.invoices = [];
-                this.filteredInvoices = [];
-              }
-            },
-            error: (error) => {
-              console.error('API Call Failed:', error);
-            },
-          });
-        }
-      });
-    }
+      this.invoiceService.getAll().subscribe({
+        next: (response) => {
+          if (response.status !== 'error' && Array.isArray(response)) {
+            this.invoices = response;
+            this.filteredInvoices = [...this.invoices];
+            this.resetPagination();
+            if (this.filteredInvoices.length > 0) {
+              this.selectInvoice(this.filteredInvoices[0]);
+            }
+          } else {
+            this.invoices = [];
+            this.filteredInvoices = [];
+          }
+        },
+        error: (error) => {
+          console.error('API Call Failed:', error);
+        },
+      })
+    
   }
 
   filterInvoices(query: string) {

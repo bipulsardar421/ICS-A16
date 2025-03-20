@@ -15,6 +15,8 @@ export class AuthService {
   private sessionCheckUrl = `${this.baseUrl}/auth/session/check`;
   private logoutUrl = `${this.baseUrl}/auth/session/logout`;
   private getUserId = `${this.baseUrl}/auth/session/getId`;
+  private getIsNew = `${this.baseUrl}/auth/session/isNew`;
+
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   private userRoleSubject = new BehaviorSubject<string | null>(null);
@@ -103,5 +105,10 @@ export class AuthService {
           }
         })
       );
+  }
+  getIsNewFun(): Observable<any> {
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    return this.http
+      .post(this.getIsNew, {}, { headers, withCredentials: true })
   }
 }
