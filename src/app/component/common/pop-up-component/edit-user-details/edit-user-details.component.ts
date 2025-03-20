@@ -1,3 +1,4 @@
+// edit-user-details.component.ts
 import {
   Component,
   inject,
@@ -37,6 +38,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
   userId: number | null = null;
   userData: UsersInterface | null = null;
   dbId: number | null = null;
+  previewUrl: string | null = null; // Add preview URL property
 
   @ViewChild('editModal') editModalContent?: TemplateRef<any>;
 
@@ -52,11 +54,10 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     this.modalSubscription = this.modalService.openModalEvent.subscribe(
       (modalType: ModalType) => {
         if (modalType === ModalType.EDITUSER) {
-          // Assuming EDITUSER is correct
           const data = this.modalService.getCurrentData();
           if (data?.type === 'edit' && data?.data) {
-            this.userData = data.data as UsersInterface; // Type assertion
-            this.userId = this.userData.user_id; // Now safe
+            this.userData = data.data as UsersInterface;
+            this.userId = this.userData.user_id;
             this.loadUserData();
           }
           this.openModal();
@@ -70,11 +71,17 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     if (this.modalSubscription) {
       this.modalSubscription.unsubscribe();
     }
+    // Clean up preview URL to prevent memory leaks
+    if (this.previewUrl) {
+      URL.revokeObjectURL(this.previewUrl);
+    }
   }
+
   isImageString(): boolean {
     const imageValue = this.editForm.get('image')?.value;
     return imageValue && !(imageValue instanceof File);
   }
+
   loadUserData() {
     if (!this.userId) return;
 
@@ -89,9 +96,10 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
             name: user.user_name,
             phone: user.phone,
             address: user.address,
-            image: user.image, // This will be a string (URL); file input handled separately
+            image: user.image,
             status: user.status,
           });
+          this.previewUrl = null; // Reset preview when loading existing data
         }
       },
       error: (error) => console.error('Error loading user data:', error),
@@ -101,7 +109,13 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
   onFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.editForm.patchValue({ image: input.files[0] });
+      const file = input.files[0];
+      this.editForm.patchValue({ image: file });
+      // Generate preview URL
+      if (this.previewUrl) {
+        URL.revokeObjectURL(this.previewUrl); // Clean up previous preview
+      }
+      this.previewUrl = URL.createObjectURL(file);
     }
   }
 
@@ -122,7 +136,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     if (imageValue instanceof File) {
       formData.append('image', imageValue);
     } else if (imageValue) {
-      formData.append('image', imageValue); // Existing image URL
+      formData.append('image', imageValue);
     }
 
     this.userService.editDetails(formData).subscribe({
@@ -135,9 +149,8 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
             user_name: this.editForm.get('name')!.value,
             phone: this.editForm.get('phone')!.value,
             address: this.editForm.get('address')!.value || '',
-            image: imageValue instanceof File ? '' : imageValue, // New URL not returned, fetch if needed
+            image: imageValue instanceof File ? '' : imageValue,
           };
-          // Notify subscribers of the update
           this.userService.notifyUserUpdated(updatedUser);
           this.closeModal();
           if (imageValue instanceof File) {
@@ -150,6 +163,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
       error: (error) => console.error('Error updating user:', error),
     });
   }
+
   private loadUserDataAfterUpdate() {
     const formData = new FormData();
     formData.append('id', this.userId!.toString());
@@ -157,12 +171,14 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.length > 0) {
           const updatedUser = response[0];
-          this.userService.notifyUserUpdated(updatedUser); // Emit fully updated user
+          this.userService.notifyUserUpdated(updatedUser);
+          this.previewUrl = null; // Reset preview after successful upload
         }
       },
       error: (error) => console.error('Error fetching updated user:', error),
     });
   }
+
   openModal() {
     if (!this.editModalContent) {
       console.warn('Edit modal content is not available yet.');
@@ -192,10 +208,14 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
   }
 
   private resetForm() {
-    this.editForm.reset({ status: 'active' }); // Reset with default status
+    this.editForm.reset({ status: 'active' });
     this.editForm.markAsPristine();
     this.userId = null;
     this.userData = null;
+    if (this.previewUrl) {
+      URL.revokeObjectURL(this.previewUrl);
+      this.previewUrl = null;
+    }
   }
 
   private getDismissReason(reason: any): string {

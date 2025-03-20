@@ -1,3 +1,4 @@
+// add-edit-product.component.ts
 import {
   Component,
   OnInit,
@@ -44,11 +45,12 @@ export class AddEditProductComponent implements OnInit {
   userRole$ = this.authService.userRole$;
   productForm!: FormGroup;
   selectedFile: File | null = null;
+  previewUrl: string | null = null;
   what = 'Add';
   vendorsList: { id: string; name: string }[] = [];
-  currentProduct: StockInterface | null = null; // Store product being edited
-  isSubmitting = false; // Track submission state
-  private modalRef: any; // Store modal reference
+  currentProduct: StockInterface | null = null;
+  isSubmitting = false;
+  private modalRef: any;
 
   @ViewChild('add_product') add_productModalContent!: TemplateRef<any>;
 
@@ -95,13 +97,13 @@ export class AddEditProductComponent implements OnInit {
 
   private buildForm() {
     this.productForm = this.fb.group({
-      product_id: [0], // Separate control for product ID
+      product_id: [0],
       product_name: ['', [Validators.required, Validators.maxLength(255)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       rate: [0, [Validators.required, Validators.min(1)]],
       vendors: ['', Validators.required],
       recieved_date: ['', Validators.required],
-      image: [null], // Image optional for edit
+      image: [null],
     });
   }
 
@@ -110,9 +112,17 @@ export class AddEditProductComponent implements OnInit {
       product_id: 0,
       quantity: 1,
       rate: 0,
+      product_name: '',
+      vendors: '',
+      recieved_date: '',
+      image: null,
     });
     this.selectedFile = null;
     this.invalidImageFormat = false;
+    if (this.previewUrl) {
+      URL.revokeObjectURL(this.previewUrl); // Release the object URL
+    }
+    this.previewUrl = null; // Ensure previewUrl is reset to null
   }
 
   private loadVendors() {
@@ -138,10 +148,15 @@ export class AddEditProductComponent implements OnInit {
       if (!allowedTypes.includes(file.type)) {
         this.invalidImageFormat = true;
         this.productForm.get('image')?.setErrors({ invalidFormat: true });
+        this.previewUrl = null;
       } else {
         this.invalidImageFormat = false;
         this.selectedFile = file;
         this.productForm.patchValue({ image: this.selectedFile });
+        if (this.previewUrl) {
+          URL.revokeObjectURL(this.previewUrl);
+        }
+        this.previewUrl = URL.createObjectURL(file);
       }
     }
   }
@@ -154,10 +169,11 @@ export class AddEditProductComponent implements OnInit {
       quantity: product.quantity,
       rate: product.rate,
       vendors: product.vendor_id.toString(),
-      recieved_date: product.recieved_date.split('T')[0], 
+      recieved_date: product.recieved_date.split('T')[0],
       image: product.image,
     });
     this.selectedFile = null;
+    this.previewUrl = null;
   }
 
   onSubmit() {
@@ -176,13 +192,16 @@ export class AddEditProductComponent implements OnInit {
       formData.set('image', this.currentProduct.image);
     }
 
-    console.log('Form data:', Array.from(formData.entries())); // Debug FormData
+    console.log('Form data:', Array.from(formData.entries()));
 
     this.alertService.showLoading();
 
     const request =
       this.what === 'Edit' && this.currentProduct
-        ? this.stockService.updateStock(this.currentProduct.product_id, formData)
+        ? this.stockService.updateStock(
+            this.currentProduct.product_id,
+            formData
+          )
         : this.stockService.addStock(formData);
 
     request
@@ -216,6 +235,8 @@ export class AddEditProductComponent implements OnInit {
     if (this.add_productModalContent) {
       this.modalRef = this.ngbModalService.open(this.add_productModalContent, {
         ariaLabelledBy: 'modal-basic-title',
+        backdrop: 'static',
+        keyboard: false,
       });
     }
   }
@@ -226,6 +247,7 @@ export class AddEditProductComponent implements OnInit {
       this.modalRef = null;
     }
     this.resetForm();
+    this.previewUrl = null;
     this.modalService.clearCurrentData();
   }
 }

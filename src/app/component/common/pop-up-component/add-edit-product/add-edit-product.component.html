@@ -1,3 +1,4 @@
+<!-- add-edit-product.component.html (unchanged) -->
 <ng-template #add_product let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">{{ what + " Product" }}</h4>
@@ -5,7 +6,7 @@
       type="button"
       class="btn-close"
       aria-label="Close"
-      (click)="modal.dismiss('Cross click')"
+      (click)="closeModal()"
     ></button>
   </div>
   <div class="modal-body">
@@ -128,38 +129,43 @@
         </div>
       </div>
 
-      <!-- Show current image in Edit mode -->
-      <div class="mb-3" *ngIf="what === 'Edit' && currentProduct?.image">
-        <label>Current Image:</label>
-        <img
-          [src]="currentProduct!.image"
-          alt="Current Product Image"
-          height="80px"
-          width="120px"
-          style="object-fit: cover"
-        />
-      </div>
-
-      <div class="form-group mb-3">
-        <label for="image">Upload Image</label>
+      <div class="mb-3">
+        <div *ngIf="previewUrl || (what === 'Edit' && currentProduct?.image)">
+          <label>{{ previewUrl ? 'Preview Image:' : 'Current Image:' }}</label>
+          <img
+            [src]="previewUrl || currentProduct!.image"
+            alt="Product Image"
+            height="80px"
+            width="120px"
+            style="object-fit: cover"
+            class="mb-2"
+          />
+        </div>
+        <label for="image" class="form-label">Upload Image</label>
         <input
           type="file"
           id="image"
           class="form-control"
           (change)="onFileChange($event)"
+          accept="image/*"
         />
         <div *ngIf="invalidImageFormat" class="text-danger">
           Only JPG and PNG images are allowed.
         </div>
       </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="productForm.invalid || isSubmitting"
-      >
-        {{ isSubmitting ? "Submitting..." : "Submit" }}
-      </button>
     </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onSubmit()"
+      [disabled]="productForm.invalid || isSubmitting"
+    >
+      {{ isSubmitting ? "Submitting..." : "Submit" }}
+    </button>
   </div>
 </ng-template>

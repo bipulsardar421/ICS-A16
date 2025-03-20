@@ -1,3 +1,4 @@
+<!-- edit-user-details.component.html -->
 <ng-template #editModal>
   <div class="modal-header">
     <h5 class="modal-title" id="modal-basic-title">Edit User Details</h5>
@@ -40,14 +41,16 @@
         ></textarea>
       </div>
       <div class="mb-3">
-        <small *ngIf="isImageString()">
+        <!-- Display existing image or preview -->
+        <div *ngIf="previewUrl || (isImageString() && editForm.get('image')?.value)">
           <img
-            src="{{ editForm.get('image')?.value }}"
-            alt="No Img Found"
+            [src]="previewUrl || editForm.get('image')?.value"
+            alt="User Image"
             height="120px"
             width="120px"
-          /> </small
-        ><br />
+            class="mb-2"
+          />
+        </div>
         <label for="image" class="form-label">Image</label>
         <input
           type="file"

@@ -13,7 +13,8 @@ export enum ModalType {
   INVOICE = 'INVOICE',
   REALCLIENT = 'REALCLIENT', // Ensure these are defined
   REALVENDOR = 'REALVENDOR',
-  EDITUSER ='EDITUSER'
+  EDITUSER ='EDITUSER',
+  LOGINHELPER='LOGINHELPER'
 }
 
 @Injectable({

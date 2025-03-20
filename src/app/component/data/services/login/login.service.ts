@@ -19,7 +19,7 @@ export class LoginService {
   private changePwdUrl: string = `${this.apiService.getBaseUrl()}/login/change-pwd`;
   private userDetails: string = `${this.apiService.getBaseUrl()}/login/get-users`;
   private editUserRoleUrl: string = `${this.apiService.getBaseUrl()}/login/edit-role`;
-
+  private resetPwdUrl: string = `${this.apiService.getBaseUrl()}/login/reset-pwd`;
 
   login(formData: FormData): Observable<any> {
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
@@ -63,25 +63,23 @@ export class LoginService {
       withCredentials: true,
     });
   }
+  resetPwd(formData: FormData): Observable<any> {
+    return this.http.post(this.resetPwdUrl, formData, {
+      headers: new HttpHeaders({ enctype: 'multipart/form-data' }),
+      withCredentials: true,
+    });
+  }
 
   getUserDetails(formData: FormData): Observable<any> {
-    return this.http.post(
-      this.userDetails,
-       formData ,
-      {
-        headers: new HttpHeaders({ enctype: 'multipart/form-data' }),
-        withCredentials: true,
-      }
-    );
+    return this.http.post(this.userDetails, formData, {
+      headers: new HttpHeaders({ enctype: 'multipart/form-data' }),
+      withCredentials: true,
+    });
   }
   editUserRole(formData: FormData): Observable<any> {
-    return this.http.post(
-      this.editUserRoleUrl,
-       formData ,
-      {
-        headers: new HttpHeaders({ enctype: 'multipart/form-data' }),
-        withCredentials: true,
-      }
-    );
+    return this.http.post(this.editUserRoleUrl, formData, {
+      headers: new HttpHeaders({ enctype: 'multipart/form-data' }),
+      withCredentials: true,
+    });
   }
 }

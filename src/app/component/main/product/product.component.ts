@@ -85,6 +85,12 @@ export class ProductComponent implements OnInit {
     });
     this.openProduct();
   }
+  addProduct() {
+    this.modalService.dataTransferer({
+      type: 'Add',
+    });
+    this.openProduct();
+  }
   openProduct() {
     this.modalService.triggerOpenModal(ModalType.PRODUCT);
   }
