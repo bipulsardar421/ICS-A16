@@ -74,7 +74,7 @@ export class AddEditVendorComponent implements OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         if (data) {
-          // this.what = data.type;
+          
         }
       });
   }

@@ -90,9 +90,9 @@ export class InvoiceComponent implements OnInit {
 
     if (selectedClient) {
       this.invoiceForm.patchValue({
-        customer_id_display: selectedClient.id, // Display the ID
-        customer_name: selectedClient.name, // Store name
-        customer_contact: selectedClient.phone, // Store phone number
+        customer_id_display: selectedClient.id, 
+        customer_name: selectedClient.name, 
+        customer_contact: selectedClient.phone, 
       });
     }
   }
@@ -101,9 +101,9 @@ export class InvoiceComponent implements OnInit {
     const currentDate = new Date().toISOString().slice(0, 10);
 
     this.invoiceForm = this.fb.group({
-      customer_id: ['', Validators.required], // Holds the selected client_id
-      customer_name: [{ value: '', disabled: true }, Validators.required], // Holds client_name
-      customer_contact: [{ value: '', disabled: true }, Validators.required], // Holds phone number
+      customer_id: ['', Validators.required], 
+      customer_name: [{ value: '', disabled: true }, Validators.required], 
+      customer_contact: [{ value: '', disabled: true }, Validators.required], 
       invoice_date: [
         { value: currentDate, disabled: true },
         Validators.required,

@@ -1,188 +1,291 @@
 <div class="d-flex vh-100 overflow-hidden" style="padding-top: 85px">
-  <!-- Sidebar -->
   <div class="col-12 col-md-3 bg-white shadow-sm overflow-auto p-3 sidebar">
     <div class="border-bottom mb-3">
       <h5 class="font-weight-bold">Generate Report</h5>
     </div>
 
-    <form [formGroup]="reportForm" (ngSubmit)="generateReport()">
-      <div class="mb-4">
-        <label for="startDate" class="form-label">Select Start Date</label>
+    <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+      <div class="form-group mb-3">
+        <label for="reportType">Report Type</label>
+        <select
+          id="reportType"
+          class="form-control"
+          formControlName="reportType"
+          (change)="onReportTypeChange()"
+        >
+          <option value="">Select a report</option>
+          <option value="allstock">All Stock</option>
+          <option value="allvendorssupplied">All Vendors Supplied</option>
+          <option value="stock">Stock Report</option>
+          <option value="vendor">Vendor Report</option>
+          <option value="invoice">Invoice Report</option>
+          <option value="customersbydaterange">Customers by Date Range</option>
+          <option value="mostsoldproduct">Most Sold Product</option>
+        </select>
+      </div>
+
+      <div *ngIf="reportType === 'stock'" class="mb-3">
+        <label for="productName">Product Name (Optional)</label>
+        <input
+          id="productName"
+          class="form-control"
+          formControlName="productName"
+        />
+      </div>
+
+      <div *ngIf="reportType === 'vendor'" class="mb-3">
+        <label for="vendorName">Vendor Name (Optional)</label>
+        <input
+          id="vendorName"
+          class="form-control"
+          formControlName="vendorName"
+        />
+      </div>
+
+      <div *ngIf="reportType === 'invoice'" class="mb-3">
+        <label for="clientName">Client Name (Optional)</label>
+        <input
+          id="clientName"
+          class="form-control"
+          formControlName="clientName"
+        />
+        <label for="productName" class="mt-2">Product Name (Optional)</label>
+        <input
+          id="productName"
+          class="form-control"
+          formControlName="productName"
+        />
+        <label for="date" class="mt-2">Date (Optional)</label>
+        <input
+          id="date"
+          type="date"
+          class="form-control"
+          formControlName="date"
+        />
+      </div>
+
+      <div
+        *ngIf="
+          reportType === 'customersbydaterange' ||
+          reportType === 'mostsoldproduct'
+        "
+        class="mb-3"
+      >
+        <label for="startDate">Start Date&nbsp;</label
+        ><span style="color: red">*</span>
         <input
           id="startDate"
-          class="form-control"
           type="date"
-          formControlName="start"
-          [max]="maxDate"
+          class="form-control"
+          formControlName="startDate"
         />
-      </div>
-
-      <div class="mb-4">
-        <label for="endDate" class="form-label">Select End Date</label>
+        <label for="endDate" class="mt-2">End Date&nbsp;</label
+        ><span style="color: red">*</span>
         <input
           id="endDate"
-          class="form-control"
           type="date"
-          formControlName="end"
-          [max]="maxDate"
+          class="form-control"
+          formControlName="endDate"
         />
       </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        {{ loading ? "Generating..." : "Generate Report" }}
+      </button>
+      &nbsp;
       <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="reportForm.invalid"
+        type="button"
+        class="btn btn-secondary ml-2"
+        (click)="resetForm()"
       >
-        Generate Report
+        Reset
       </button>
     </form>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
   </div>
 
-  <!-- Main Content -->
   <div class="col-12 col-md-9 p-4 bg-light main-content">
     <div class="bg-white p-5 shadow-sm position-relative">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="font-weight-bold">
-          Report from
-          {{ reportForm.get("start")?.value | date : "longDate" }} to
-          {{ reportForm.get("end")?.value | date : "longDate" }}
-        </h3>
+        <h4>Report</h4>
+        <button
+          class="btn btn-outline-primary"
+          (click)="printReport()"
+          *ngIf="reportData.length > 0"
+        >
+          Print
+        </button>
       </div>
 
-      <div *ngIf="reportData; else noData">
-        <!-- Stock Report -->
-        <div class="mb-5">
-          <h5 class="font-weight-bold mb-3">Stock Report</h5>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Stock on Hand</th>
-                <th>Rate ($)</th>
-                <th>Received Date</th>
-                <th>Supplier</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of reportData.stock_report">
-                <td>{{ row.product_id }}</td>
-                <td>{{ row.product_name }}</td>
-                <td>{{ row.stock_on_hand }}</td>
-                <td>{{ row.rate | number : "1.2-2" }}</td>
-                <td>{{ row.recieved_date }}</td>
-                <td>{{ row.supplier }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div *ngIf="reportData.length > 0; else noData">
+        <table *ngIf="reportType === 'allstock'" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Stock on Hand</th>
+              <th>Rate</th>
+              <th>Received Date</th>
+              <th>Vendor ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.product_id }}</td>
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.rate }}</td>
+              <td>{{ item.recieved_date | date }}</td>
+              <td>{{ item.vendor_id }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Vendor Report -->
-        <div class="mb-5">
-          <h5 class="font-weight-bold mb-3">Vendor Report</h5>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Vendor ID</th>
-                <th>Vendor Name</th>
-                <th>Contact Person</th>
-                <th>Phone</th>
-                <th>Product Name</th>
-                <th>Supplied Quantity</th>
-                <th>Rate ($)</th>
-                <th>Received Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of reportData.vendor_report">
-                <td>{{ row.vendor_id }}</td>
-                <td>{{ row.vendor_name }}</td>
-                <td>{{ row.contact_person }}</td>
-                <td>{{ row.phone }}</td>
-                <td>{{ row.product_name }}</td>
-                <td>{{ row.supplied_quantity }}</td>
-                <td>{{ row.rate | number : "1.2-2" }}</td>
-                <td>{{ row.recieved_date }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table
+          *ngIf="reportType === 'allvendorssupplied'"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th>Vendor ID</th>
+              <th>Vendor Name</th>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Total Supplied</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.vendor_id }}</td>
+              <td>{{ item.vendor_name }}</td>
+              <td>{{ item.product_id || "N/A" }}</td>
+              <td>{{ item.product_name || "N/A" }}</td>
+              <td>{{ item.total_supplied || "0" }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Invoice Date Report -->
-        <div class="mb-5">
-          <h5 class="font-weight-bold mb-3">Invoice by Date</h5>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Invoice Date</th>
-                <th>Invoice Count</th>
-                <th>Total Amount ($)</th>
-                <th>Payment Status</th>
-                <th>Invoice IDs</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of reportData.invoice_date_report">
-                <td>{{ row.invoice_date }}</td>
-                <td>{{ row.invoice_count }}</td>
-                <td>{{ row.total_amount | number : "1.2-2" }}</td>
-                <td>{{ row.payment_status }}</td>
-                <td>{{ row.invoice_ids }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table *ngIf="reportType === 'stock'" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Stock on Hand</th>
+              <th>Rate</th>
+              <th>Received Date</th>
+              <th>Vendor ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.product_id }}</td>
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.rate }}</td>
+              <td>{{ item.recieved_date | date }}</td>
+              <td>{{ item.vendor_id }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Invoice Client Report -->
-        <div class="mb-5">
-          <h5 class="font-weight-bold mb-3">Invoice by Client</h5>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Client ID</th>
-                <th>Client Name</th>
-                <th>Invoice Count</th>
-                <th>Total Amount ($)</th>
-                <th>Payment Status</th>
-                <th>Invoice IDs</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of reportData.invoice_client_report">
-                <td>{{ row.client_id }}</td>
-                <td>{{ row.client_name }}</td>
-                <td>{{ row.invoice_count }}</td>
-                <td>{{ row.total_amount | number : "1.2-2" }}</td>
-                <td>{{ row.payment_status }}</td>
-                <td>{{ row.invoice_ids }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table *ngIf="reportType === 'vendor'" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Vendor ID</th>
+              <th>Vendor Name</th>
+              <th>Contact Person</th>
+              <th>Phone</th>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Quantity</th>
+              <th>Rate</th>
+              <th>Received Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.vendor_id }}</td>
+              <td>{{ item.vendor_name }}</td>
+              <td>{{ item.contact_person }}</td>
+              <td>{{ item.phone }}</td>
+              <td>{{ item.product_id || "N/A" }}</td>
+              <td>{{ item.product_name || "N/A" }}</td>
+              <td>{{ item.quantity || "0" }}</td>
+              <td>{{ item.rate || "N/A" }}</td>
+              <td>{{ item.received_date | date }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Invoice Product Report -->
-        <div class="mb-5">
-          <h5 class="font-weight-bold mb-3">Invoice by Product</h5>
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Total Quantity Sold</th>
-                <th>Total Amount ($)</th>
-                <th>Invoice Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of reportData.invoice_product_report">
-                <td>{{ row.product_id }}</td>
-                <td>{{ row.product_name }}</td>
-                <td>{{ row.total_quantity_sold }}</td>
-                <td>{{ row.total_amount | number : "1.2-2" }}</td>
-                <td>{{ row.invoice_count }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table *ngIf="reportType === 'invoice'" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Date</th>
+              <th>Client Name</th>
+              <th>Product Name</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Total Price</th>
+              <th>Grand Total</th>
+              <th>Payment Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.invoice_id }}</td>
+              <td>{{ item.invoice_date | date }}</td>
+              <td>{{ item.client_name }}</td>
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unit_price }}</td>
+              <td>{{ item.total_price }}</td>
+              <td>{{ item.grand_total }}</td>
+              <td>{{ item.payment_status }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table
+          *ngIf="reportType === 'customersbydaterange'"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th>Client ID</th>
+              <th>Client Name</th>
+              <th>Invoice Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.client_id }}</td>
+              <td>{{ item.client_name }}</td>
+              <td>{{ item.customer_count }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table
+          *ngIf="reportType === 'mostsoldproduct'"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Total Sold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of reportData">
+              <td>{{ item.product_id }}</td>
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.total_sold }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <ng-template #noData>
@@ -190,6 +293,12 @@
           No data available. Please generate a report.
         </p>
       </ng-template>
+
+      <div *ngIf="loading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>

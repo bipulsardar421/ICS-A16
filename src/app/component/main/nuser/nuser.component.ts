@@ -28,9 +28,9 @@ export class NuserComponent implements OnInit, OnDestroy {
           (user) => user.user_id === updatedUser.user_id
         );
         if (index !== -1) {
-          this.users[index] = { ...updatedUser }; // Update existing user
+          this.users[index] = { ...updatedUser }; 
         }
-        console.log('User updated in DOM:', updatedUser);
+        
       }
     );
   }
@@ -54,26 +54,26 @@ export class NuserComponent implements OnInit, OnDestroy {
   getUserDetails() {
     this.userService.getDetails().subscribe({
       next: (response) => {
-        this.users = response; // Assuming response is an array of UsersInterface
-        console.log('Users fetched:', this.users);
+        this.users = response; 
+        
       },
       error: (error) => console.error('Error fetching users:', error),
     });
   }
 
   openModal() {
-    this.modalService.triggerOpenModal(ModalType.VENDOR); // Use EDITUSER
+    this.modalService.triggerOpenModal(ModalType.VENDOR); 
   }
 
   deleteUser(index: number) {
-    const userId = this.users[index].user_id; // Use user_id
+    const userId = this.users[index].user_id; 
     const formData = new FormData();
     formData.append('id', userId.toString());
     this.userService.deleteDetails(formData).subscribe({
       next: (response) => {
         if (response.status === 'success') {
           this.users.splice(index, 1);
-          console.log('User deleted');
+          
         }
       },
       error: (error) => console.error('Error deleting user:', error),

@@ -1,6 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ClientVendorService } from '../../../data/services/client-vendor/client-vendor.service';
 import { AlertService } from '../../../data/services/alert.service';
 import { ModalService, ModalType } from '../../../data/services/modal.service';
@@ -38,21 +50,26 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
       phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
     });
 
-    this.modalSubscription = this.modalService.openModalEvent.subscribe((modalType: ModalType) => {
-      console.log('Modal event received:', modalType);
-      if (modalType === ModalType.REALCLIENT || modalType === ModalType.REALVENDOR) {
-        this.entityType = modalType === ModalType.REALCLIENT ? 'client' : 'vendor';
-        const data = this.modalService.getCurrentData();
-        console.log('Retrieved data:', data);
-        this.isEditMode = data?.type === 'Edit';
-        this.entityId = data?.id || null;
-        if (this.isEditMode && this.entityId) {
-          this.loadEntityData();
+    this.modalSubscription = this.modalService.openModalEvent.subscribe(
+      (modalType: ModalType) => {
+        if (
+          modalType === ModalType.REALCLIENT ||
+          modalType === ModalType.REALVENDOR
+        ) {
+          this.entityType =
+            modalType === ModalType.REALCLIENT ? 'client' : 'vendor';
+          const data = this.modalService.getCurrentData();
+
+          this.isEditMode = data?.type === 'Edit';
+          this.entityId = data?.id || null;
+          if (this.isEditMode && this.entityId) {
+            this.loadEntityData();
+          }
+          this.openModal();
+          this.modalService.clearCurrentData();
         }
-        this.openModal();
-        this.modalService.clearCurrentData();
       }
-    });
+    );
   }
 
   ngOnDestroy() {
@@ -68,7 +85,10 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
     }
 
     const form = new FormData();
-    form.append(this.entityType === 'client' ? 'client_id' : 'vendor_id', this.entityId.toString());
+    form.append(
+      this.entityType === 'client' ? 'client_id' : 'vendor_id',
+      this.entityId.toString()
+    );
     const serviceMethod =
       this.entityType === 'client'
         ? this._clientVendorService.getClientById(form)
@@ -76,7 +96,6 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
 
     serviceMethod.subscribe({
       next: (response: { status: string; data: string }) => {
-        console.log('Load entity response:', response);
         if (response.status === 'Success') {
           const data = JSON.parse(response.data);
           this.editForm.patchValue({
@@ -103,13 +122,22 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
     }
 
     const formData = new FormData();
-    formData.append(this.entityType === 'client' ? 'client_name' : 'vendor_name', this.editForm.get('name')?.value);
-    formData.append('contact_person', this.editForm.get('contactPerson')?.value || '');
+    formData.append(
+      this.entityType === 'client' ? 'client_name' : 'vendor_name',
+      this.editForm.get('name')?.value
+    );
+    formData.append(
+      'contact_person',
+      this.editForm.get('contactPerson')?.value || ''
+    );
     formData.append('address', this.editForm.get('address')?.value || '');
     formData.append('phone', this.editForm.get('phone')?.value);
 
     if (this.isEditMode && this.entityId) {
-      formData.append(this.entityType === 'client' ? 'client_id' : 'vendor_id', this.entityId.toString());
+      formData.append(
+        this.entityType === 'client' ? 'client_id' : 'vendor_id',
+        this.entityId.toString()
+      );
     }
 
     const serviceMethod = this.isEditMode
@@ -117,15 +145,18 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
         ? this._clientVendorService.updateClient(formData)
         : this._clientVendorService.updateVendor(formData)
       : this.entityType === 'client'
-        ? this._clientVendorService.addClient(formData)
-        : this._clientVendorService.addVendor(formData);
+      ? this._clientVendorService.addClient(formData)
+      : this._clientVendorService.addVendor(formData);
 
     this.alertService.showLoading();
     serviceMethod.subscribe({
       next: (response: { status: string; message: any }) => {
         this.alertService.hideLoading();
         if (response.status === 'Success') {
-          this.alertService.showAlert('success', this.isEditMode ? 'Updated Successfully' : 'Added Successfully');
+          this.alertService.showAlert(
+            'success',
+            this.isEditMode ? 'Updated Successfully' : 'Added Successfully'
+          );
           this._clientVendorService.notifyDataChange(this.entityType);
           this.closeModal();
         } else {
@@ -145,23 +176,18 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
       console.warn('Edit modal content is not available yet.');
       return;
     }
-    console.log('Opening modal with:', { entityType: this.entityType, isEditMode: this.isEditMode, entityId: this.entityId });
+
     const modalRef = this.ngbModalService.open(this.editModalContent, {
       ariaLabelledBy: 'modal-basic-title',
-      backdrop: 'static', // Optional: prevents closing on backdrop click unless handled
-      keyboard: true, // Allows ESC to close
+      backdrop: 'static',
+      keyboard: true,
     });
 
-    // Handle all modal closure scenarios
     modalRef.result.then(
       (result) => {
-        // Closed with a result (e.g., via a "Save" button, if implemented)
-        console.log(`Modal closed with: ${result}`);
         this.resetForm();
       },
       (reason) => {
-        // Dismissed (backdrop click, ESC, or dismissAll)
-        console.log(`Modal dismissed: ${this.getDismissReason(reason)}`);
         this.resetForm();
       }
     );
@@ -169,7 +195,7 @@ export class AddEditClientVendorComponent implements OnInit, OnDestroy {
 
   closeModal() {
     if (this.ngbModalService.hasOpenModals()) {
-      this.ngbModalService.dismissAll(); // This triggers the 'reason' callback in openModal
+      this.ngbModalService.dismissAll();
     }
   }
 

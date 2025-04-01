@@ -38,7 +38,7 @@ export class ProductComponent implements OnInit {
       );
     });
     this._stockService.getStockUpdateListener().subscribe(() => {
-      console.log('Stock update received, refreshing products');
+      
       this.getStockDetails();
     });
   }

@@ -11,7 +11,7 @@
 
   <div class="modal-body">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
-      <!-- Email -->
+      
       <div class="mb-3">
         <label for="email" class="form-label">Email:</label>
         <input
@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <!-- Password -->
+      
       <div class="mb-3">
         <label for="password" class="form-label">Password:</label>
         <input
@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <!-- Confirm Password -->
+      
       <div class="mb-3">
         <label for="confirmPassword" class="form-label">Confirm Password:</label>
         <input
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <!-- Role -->
+      
       <div class="mb-3">
         <label for="role" class="form-label">Role:</label>
         <select
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <!-- Name -->
+      
       <div class="mb-3">
         <label for="name" class="form-label">Name:</label>
         <input
@@ -92,7 +92,7 @@
         </div>
       </div>
 
-      <!-- Phone -->
+      
       <div class="mb-3">
         <label for="phone" class="form-label">Phone:</label>
         <input
@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <!-- Address -->
+      
       <div class="mb-3">
         <label for="address" class="form-label">Address:</label>
         <textarea
@@ -123,7 +123,7 @@
         </div>
       </div>
 
-      <!-- Image Upload -->
+      
       <div class="mb-3">
         <label for="image" class="form-label">Upload Image:</label>
         <input type="file" class="form-control" (change)="onFileChange($event)" />
@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <!-- Buttons -->
+      
       <div class="d-flex justify-content-center">
         <button type="button" class="btn btn-danger me-2" (click)="modal.dismiss('Cross click')">
           Close

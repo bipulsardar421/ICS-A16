@@ -96,7 +96,7 @@ export class UserService {
     });
   }
 
-  notifyUserUpdated(user: UsersInterface) { // New method to emit updates
+  notifyUserUpdated(user: UsersInterface) { 
     this.userUpdated.next(user);
   }
 }

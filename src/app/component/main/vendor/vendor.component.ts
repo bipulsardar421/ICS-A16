@@ -25,7 +25,7 @@ export class VendorComponent implements OnInit, OnDestroy {
     this.fetchVendors();
     this.dataChangeSubscription = this._vendor.dataChanged$.subscribe((entityType) => {
       if (entityType === 'vendor') {
-        console.log('Vendor data changed, refreshing table');
+        
         this.fetchVendors();
       }
     });
@@ -55,7 +55,7 @@ export class VendorComponent implements OnInit, OnDestroy {
   }
 
   addVendor() {
-    console.log('Adding new vendor');
+    
     this.modalService.dataTransferer({ type: 'Add' });
     this.openModel();
   }
@@ -65,7 +65,7 @@ export class VendorComponent implements OnInit, OnDestroy {
   }
 
   manageVendor(vendorId: number) {
-    console.log('Managing vendor with ID:', vendorId);
+    
     this.modalService.dataTransferer({ type: 'Edit', id: vendorId });
     this.openModel();
   }
@@ -78,7 +78,7 @@ export class VendorComponent implements OnInit, OnDestroy {
         if (response.status === 'Success') {
           this.vendors = this.vendors.filter((vendor) => vendor.vendor_id !== vendorId);
           this._vendor.notifyDataChange('vendor'); 
-          console.log('Vendor deleted successfully');
+          
         } else {
           console.error('Error deleting vendor:', response.message);
         }

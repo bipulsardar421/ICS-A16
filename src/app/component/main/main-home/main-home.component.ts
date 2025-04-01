@@ -24,7 +24,7 @@ export class MainHomeComponent {
       tap(() => {
         this.authService.getIsNewFun().subscribe({
           next: (res: any) => {
-            console.log('getIsNew response:', res);
+            
             const isNew = res?.isNew === 'true';
             if (isNew) {
               this.modalService.triggerOpenModal(ModalType.LOGINHELPER);

@@ -76,10 +76,10 @@ export class NewLoginHelperComponent implements OnInit {
 
     modalRef.result.then(
       (result) => {
-        console.log(`Modal closed with: ${result}`);
+        
       },
       (reason) => {
-        console.log(`Modal dismissed: ${this.getDismissReason(reason)}`);
+        
       }
     );
   }

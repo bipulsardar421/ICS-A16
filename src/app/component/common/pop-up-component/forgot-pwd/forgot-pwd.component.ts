@@ -48,7 +48,7 @@ export class ForgotPwdComponent {
     this._loginService.genOtp(FormDataConverter.toFormData(this.forgotPasswordForm)).subscribe({
       next: (response) => {
         this.alertService.hideLoading();
-        console.log('response from api', response);
+        
         if (response.status !== 'error') {
           this.alertService.showAlert('success', response.message);
           this.otpSubmitForm.addControl('username', new FormControl(this.forgotPasswordForm.controls['username'].value
@@ -69,7 +69,7 @@ export class ForgotPwdComponent {
     this._loginService.matchOtp(FormDataConverter.toFormData(this.otpSubmitForm)).subscribe({
       next: (response) => {
         this.alertService.hideLoading();
-        console.log('response from api', response);
+        
         if (response.status !== 'error') {
           this.alertService.showAlert('success', response.message);
           this.ngbModalService.dismissAll();

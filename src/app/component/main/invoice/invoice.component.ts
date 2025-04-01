@@ -93,7 +93,7 @@ export class InvoiceComponent implements OnInit {
 
   resetPagination() {
     this.currentPage = 1;
-    console.log('Filtered Invoices:', this.filteredInvoices);
+    
     this.paginatedInvoices = this.filteredInvoices.slice(
       0,
       this.invoicesPerPage

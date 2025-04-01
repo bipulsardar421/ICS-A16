@@ -1,5 +1,5 @@
 <div class="d-flex" style="margin-top: 60px">
-  <!-- Sidebar -->
+  
   <div
     class="w-25 bg-white shadow-lg overflow-auto sidebar mt-4"
     style="margin-left: 5px"
@@ -8,7 +8,7 @@
       <h1 class="h5 font-weight-bold">INVOICES</h1>
     </div>
 
-    <!-- Search Bar -->
+    
     <ul class="list-unstyled p-3 w-100">
       <div class="d-flex justify-content-center my-3">
         <form [formGroup]="searchForm" class="w-100">
@@ -23,7 +23,7 @@
         </form>
       </div>
 
-      <!-- Invoice List -->
+      
       <li
         *ngFor="let invoice of paginatedInvoices"
         class="p-2 bg-light rounded mb-2 w-100"
@@ -35,7 +35,7 @@
         }}
       </li>
 
-      <!-- No Results Found -->
+      
       <li
         *ngIf="paginatedInvoices.length === 0"
         class="p-2 bg-light text-center"
@@ -43,7 +43,7 @@
         No Results Found
       </li>
 
-      <!-- Show More Button -->
+      
       <li *ngIf="showMoreVisible" class="text-center mt-2">
         <button class="btn btn-primary btn-sm" (click)="loadMore()">
           Show More
@@ -51,7 +51,7 @@
       </li>
     </ul>
   </div>
-  <!-- Main Content -->
+  
   <div class="flex-fill p-4" #main_section *ngIf="paginatedInvoices.length > 0">
     <div class="bg-white p-5 shadow-lg position-relative main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -68,14 +68,14 @@
         </div>
       </div>
 
-      <!-- Client Details -->
+      
       <div class="mb-4">
         <h3 class="font-weight-bold">BILL TO:</h3>
         <p>{{ client.name || "N/A" }}</p>
         <p>Phone: {{ client.phone || "N/A" }}</p>
       </div>
 
-      <!-- Invoice Table -->
+      
       <table class="table table-bordered mb-4">
         <thead>
           <tr>

@@ -25,7 +25,7 @@ export class ClientComponent implements OnInit, OnDestroy {
     this.fetchClients();
     this.dataChangeSubscription = this._client.dataChanged$.subscribe((entityType) => {
       if (entityType === 'client') {
-        console.log('Client data changed, refreshing table');
+        
         this.fetchClients();
       }
     });
@@ -59,19 +59,19 @@ export class ClientComponent implements OnInit, OnDestroy {
   }
 
   manageClient(clientId: number) {
-    console.log('Managing client with ID:', clientId);
+    
     this.modalService.dataTransferer({ type: 'Edit', id: clientId });
     this.openModel();
   }
 
   addClient() {
-    console.log('Adding new client');
+    
     this.modalService.dataTransferer({ type: 'Add' });
     this.openModel();
   }
 
   deleteClient(clientId: number) {
-    console.log(`Deleting client with ID: ${clientId}`);
+    
     const form = new FormData();
     form.append('client_id', clientId.toString());
     this._client.deleteClient(form).subscribe(
@@ -79,7 +79,7 @@ export class ClientComponent implements OnInit, OnDestroy {
         if (response.status === 'Success') {
           this.clients = this.clients.filter((client) => client.client_id !== clientId);
           this._client.notifyDataChange('client'); 
-          console.log('Client deleted successfully');
+          
         } else {
           console.error('Error deleting client:', response.message);
         }

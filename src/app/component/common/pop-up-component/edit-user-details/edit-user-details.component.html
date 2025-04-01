@@ -1,4 +1,4 @@
-<!-- edit-user-details.component.html -->
+
 <ng-template #editModal>
   <div class="modal-header">
     <h5 class="modal-title" id="modal-basic-title">Edit User Details</h5>
@@ -41,7 +41,7 @@
         ></textarea>
       </div>
       <div class="mb-3">
-        <!-- Display existing image or preview -->
+        
         <div *ngIf="previewUrl || (isImageString() && editForm.get('image')?.value)">
           <img
             [src]="previewUrl || editForm.get('image')?.value"

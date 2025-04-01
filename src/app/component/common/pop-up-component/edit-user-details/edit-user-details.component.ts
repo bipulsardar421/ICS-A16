@@ -1,4 +1,4 @@
-// edit-user-details.component.ts
+
 import {
   Component,
   inject,
@@ -38,7 +38,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
   userId: number | null = null;
   userData: UsersInterface | null = null;
   dbId: number | null = null;
-  previewUrl: string | null = null; // Add preview URL property
+  previewUrl: string | null = null; 
 
   @ViewChild('editModal') editModalContent?: TemplateRef<any>;
 
@@ -71,7 +71,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     if (this.modalSubscription) {
       this.modalSubscription.unsubscribe();
     }
-    // Clean up preview URL to prevent memory leaks
+    
     if (this.previewUrl) {
       URL.revokeObjectURL(this.previewUrl);
     }
@@ -99,7 +99,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
             image: user.image,
             status: user.status,
           });
-          this.previewUrl = null; // Reset preview when loading existing data
+          this.previewUrl = null; 
         }
       },
       error: (error) => console.error('Error loading user data:', error),
@@ -111,9 +111,9 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       this.editForm.patchValue({ image: file });
-      // Generate preview URL
+      
       if (this.previewUrl) {
-        URL.revokeObjectURL(this.previewUrl); // Clean up previous preview
+        URL.revokeObjectURL(this.previewUrl); 
       }
       this.previewUrl = URL.createObjectURL(file);
     }
@@ -142,7 +142,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     this.userService.editDetails(formData).subscribe({
       next: (response) => {
         if (response.status === 'success') {
-          console.log('User updated successfully');
+          
           const updatedUser: UsersInterface = {
             id: this.dbId!,
             user_id: this.userId!,
@@ -172,7 +172,7 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
         if (response.length > 0) {
           const updatedUser = response[0];
           this.userService.notifyUserUpdated(updatedUser);
-          this.previewUrl = null; // Reset preview after successful upload
+          this.previewUrl = null; 
         }
       },
       error: (error) => console.error('Error fetching updated user:', error),
@@ -191,11 +191,11 @@ export class EditUserDetailsComponent implements OnInit, OnDestroy {
     });
     modalRef.result.then(
       (result) => {
-        console.log(`Modal closed with: ${result}`);
+        
         this.resetForm();
       },
       (reason) => {
-        console.log(`Modal dismissed: ${this.getDismissReason(reason)}`);
+        
         this.resetForm();
       }
     );

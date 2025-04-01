@@ -27,13 +27,11 @@
           />
           <h5 class="card-title">{{ vendor.user_name }}</h5>
           <p class="text-muted">{{ vendor.phone }}</p>
-          <div class="d-flex justify-content-between">
+          <div class="d-flex justify-content-center">
             <button class="btn btn-primary btn-sm" (click)="editUser(vendor)">
               Manage
             </button>
-            <button (click)="deleteUser(i)" class="btn btn-danger btn-sm">
-              Delete
-            </button>
+           
           </div>
         </div>
       </div>

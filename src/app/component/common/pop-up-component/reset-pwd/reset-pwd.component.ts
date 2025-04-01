@@ -40,7 +40,7 @@ export class ResetPwdComponent {
         this._loginService.changePwd(FormDataConverter.toFormData(this.changePasswordForm)).subscribe({
           next: (response) => {
             this.alertService.hideLoading();
-            console.log('response from api', response);
+            
             if (response.status !== 'error') {
               this.alertService.showAlert('success', response.message);
               this.ngbModalService.dismissAll();

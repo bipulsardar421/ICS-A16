@@ -23,10 +23,10 @@ export class CartService {
         return;
       }
       existingItem.quantity = newQuantity;
-      console.log('Bipul', existingItem);
+      
     } else {
       this.cartItems.push(item);
-      console.log('bipul_cart', this.cartItems);
+      
     }
 
     this.cartSubject.next([...this.cartItems]);

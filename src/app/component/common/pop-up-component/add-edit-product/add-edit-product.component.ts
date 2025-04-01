@@ -1,4 +1,4 @@
-// add-edit-product.component.ts
+
 import {
   Component,
   OnInit,
@@ -120,9 +120,9 @@ export class AddEditProductComponent implements OnInit {
     this.selectedFile = null;
     this.invalidImageFormat = false;
     if (this.previewUrl) {
-      URL.revokeObjectURL(this.previewUrl); // Release the object URL
+      URL.revokeObjectURL(this.previewUrl); 
     }
-    this.previewUrl = null; // Ensure previewUrl is reset to null
+    this.previewUrl = null; 
   }
 
   private loadVendors() {
@@ -162,7 +162,7 @@ export class AddEditProductComponent implements OnInit {
   }
 
   ifEditSetForm(product: StockInterface) {
-    console.log('Editing product:', product);
+    
     this.productForm.patchValue({
       product_id: product.product_id,
       product_name: product.product_name,
@@ -192,7 +192,7 @@ export class AddEditProductComponent implements OnInit {
       formData.set('image', this.currentProduct.image);
     }
 
-    console.log('Form data:', Array.from(formData.entries()));
+    
 
     this.alertService.showLoading();
 

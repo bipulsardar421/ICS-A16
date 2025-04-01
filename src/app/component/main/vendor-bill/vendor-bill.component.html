@@ -1,11 +1,11 @@
 <div class="d-flex" style="margin-top: 60px">
-    <!-- Sidebar -->
+    
     <div class="w-25 bg-white shadow-lg overflow-auto sidebar mt-4" style="margin-left: 5px">
       <div class="p-3 border-bottom">
         <h1 class="h5 font-weight-bold">BILLS</h1>
       </div>
   
-      <!-- Search Bar -->
+      
       <ul class="list-unstyled p-3 w-100">
         <div class="d-flex justify-content-center my-3">
           <form [formGroup]="searchForm" class="w-100">
@@ -15,7 +15,7 @@
           </form>
         </div>
   
-        <!-- Bill List -->
+        
         <li
           *ngFor="let bill of filteredBills"
           class="p-2 bg-light rounded mb-2 w-100"
@@ -25,14 +25,14 @@
           {{ bill.customer_name }}_{{ bill.customer_contact }}_{{ bill.invoice_id }}
         </li>
   
-        <!-- No Results Found -->
+        
         <li *ngIf="filteredBills.length === 0" class="p-2 bg-light text-center">
           No Results Found
         </li>
       </ul>
     </div>
   
-    <!-- Main Bill Content -->
+    
     <div class="flex-fill p-4" #main_section>
       <div *ngIf="selectedBillDetails" class="bg-white p-5 shadow-lg position-relative main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -46,7 +46,7 @@
           </div>
         </div>
   
-        <!-- Bill Items Table -->
+        
         <table class="table table-bordered mb-4">
           <thead>
             <tr>

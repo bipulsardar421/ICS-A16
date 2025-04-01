@@ -11,7 +11,7 @@ export enum ModalType {
   OTP = 'OTP',
   USER = 'USER',
   INVOICE = 'INVOICE',
-  REALCLIENT = 'REALCLIENT', // Ensure these are defined
+  REALCLIENT = 'REALCLIENT', 
   REALVENDOR = 'REALVENDOR',
   EDITUSER ='EDITUSER',
   LOGINHELPER='LOGINHELPER'
@@ -24,17 +24,17 @@ export class ModalService {
   private modalService = inject(NgbModal);
   public openModalEvent: EventEmitter<ModalType> = new EventEmitter<ModalType>();
   public dataTransferObject: EventEmitter<any> = new EventEmitter<any>();
-  private currentData: any = null; // Store data here
+  private currentData: any = null; 
 
   open(content: TemplateRef<any>) {
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then(
         (result) => {
-          console.log(`Closed with: ${result}`);
+          
         },
         (reason) => {
-          console.log(`Dismissed ${this.getDismissReason(reason)}`);
+          
         }
       );
   }
@@ -51,21 +51,21 @@ export class ModalService {
   }
 
   triggerOpenModal(modalType: ModalType) {
-    console.log('Triggering modal:', modalType, 'with data:', this.currentData);
+    
     this.openModalEvent.emit(modalType);
   }
 
   public dataTransferer(dto: any) {
-    console.log('Storing data:', dto);
-    this.currentData = dto; // Store data synchronously
-    this.dataTransferObject.emit(dto); // Still emit for other subscribers
+    
+    this.currentData = dto; 
+    this.dataTransferObject.emit(dto); 
   }
 
   public getCurrentData(): any {
-    return this.currentData; // Retrieve stored data
+    return this.currentData; 
   }
 
   public clearCurrentData() {
-    this.currentData = null; // Clear after use
+    this.currentData = null; 
   }
 }

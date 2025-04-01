@@ -46,7 +46,7 @@ export class LoginService {
       .pipe(
         tap((response: any) => {
           if (response.status === 'success') {
-            console.log('Login successful:', response);
+            
             this.authService.checkSession();
           }
         }),

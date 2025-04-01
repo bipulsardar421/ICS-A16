@@ -23,7 +23,7 @@ export class MainNavigationComponent implements OnInit {
       this.role = user.role;
       this.profile_image = user.profile_image;
     });
-    console.log(this.name);
+    
   }
   isDropdownOpen: boolean = false;
   

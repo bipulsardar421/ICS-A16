@@ -18,7 +18,7 @@ export class ClientVendorService {
     this.dataChangeSubject.asObservable();
 
   public notifyDataChange(entityType: 'client' | 'vendor') {
-    console.log(`Notifying data change for: ${entityType}`);
+    
     this.dataChangeSubject.next(entityType);
   }
 

@@ -47,12 +47,9 @@ export class AuthService {
           );
           this.sessionCheckedSubject.next(true);
 
-          console.log('Session check response:', response);
-          console.log(
-            'AuthService - isAuthenticated:',
-            this.isAuthenticatedSubject.value
-          );
-          console.log('AuthService - User role:', this.userRoleSubject.value);
+          
+       
+          
         }),
         catchError((error) => {
           console.error('Session check failed', error);
